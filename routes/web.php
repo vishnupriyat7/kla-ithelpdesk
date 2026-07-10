@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ComplaintRegisterController;
 
+Route::redirect('/', '/admin');
+
 // IT Complaint Register routes for dynamic dropdowns
 Route::get('/employees/list', [EmployeeController::class, 'list']);
 

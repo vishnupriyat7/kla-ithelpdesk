@@ -275,6 +275,16 @@ class ComplaintRegisterResource extends Resource
                                     ->copyable(),
                                 Infolists\Components\TextEntry::make('status')
                                     ->badge()
+                                    ->icon(fn (string $state): ?string => $state === 'Complaint' ? 'heroicon-m-exclamation-triangle' : null)
+                                    ->url(function ($record) {
+                                        if ($record->status === 'Complaint' && $record->vendor_complaint_id) {
+                                            $vc = \App\Models\VendorComplaint::where('vendor_complaint_no', $record->vendor_complaint_id)->first();
+                                            if ($vc) {
+                                                return \App\Filament\Resources\VendorComplaintResource::getUrl('edit', ['record' => $vc->id]);
+                                            }
+                                        }
+                                        return null;
+                                    })
                                     ->color(fn(string $state): string => match ($state) {
                                         'Open' => 'danger',
                                         'Assigned' => 'warning',
@@ -287,6 +297,15 @@ class ComplaintRegisterResource extends Resource
                                 Infolists\Components\TextEntry::make('vendor_complaint_id')
                                     ->label('Complaint ID')
                                     ->badge()
+                                    ->url(function ($record) {
+                                        if ($record->vendor_complaint_id) {
+                                            $vc = \App\Models\VendorComplaint::where('vendor_complaint_no', $record->vendor_complaint_id)->first();
+                                            if ($vc) {
+                                                return \App\Filament\Resources\VendorComplaintResource::getUrl('edit', ['record' => $vc->id]);
+                                            }
+                                        }
+                                        return null;
+                                    })
                                     ->color('danger')
                                     ->icon('heroicon-m-exclamation-triangle')
                                     ->visible(fn($state) => filled($state)),
@@ -355,6 +374,17 @@ class ComplaintRegisterResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
+                    ->icon(fn (string $state): ?string => $state === 'Complaint' ? 'heroicon-m-exclamation-triangle' : null)
+                    ->url(function ($record) {
+                        if ($record->status === 'Complaint' && $record->vendor_complaint_id) {
+                            $vc = \App\Models\VendorComplaint::where('vendor_complaint_no', $record->vendor_complaint_id)->first();
+                            if ($vc) {
+                                return \App\Filament\Resources\VendorComplaintResource::getUrl('edit', ['record' => $vc->id]);
+                            }
+                        }
+                        return null;
+                    })
+                    ->openUrlInNewTab()
                     ->color(fn(string $state): string => match ($state) {
                         'Open' => 'danger',
                         'Assigned' => 'warning',
@@ -369,6 +399,7 @@ class ComplaintRegisterResource extends Resource
                     ->label('Complaint ID')
                     ->badge()
                     ->color('danger')
+                    ->icon('heroicon-m-exclamation-triangle')
                     ->url(function ($record) {
                         if (!$record->vendor_complaint_id) {
                             return null;
