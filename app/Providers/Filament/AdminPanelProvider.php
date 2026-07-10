@@ -33,7 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\CustomLogin::class)
             ->globalSearch(false)
             ->colors([
                 // 'primary' => Color::Amber,
@@ -47,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 'black' => '#000000',
                 'white' => '#FFFFFF',
             ])
-            ->brandName('KLA INTRANET')
+            ->brandName('IT HelpDesk')
             ->favicon(asset('images/favicon.png'))
             ->font('Poppins')
 
