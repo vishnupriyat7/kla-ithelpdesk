@@ -54,14 +54,10 @@ class UserResource extends Resource
                     ->dehydrateStateUsing(fn(string $state): string => Hash::make($state))
                     ->visible(fn(string $context): bool => $context === 'create')
                     ->maxLength(255),
-                Forms\Components\Select::make('role')
-                    ->options([
-                        'superadmin' => 'SuperAdmin',
-                        'admin' => 'Admin',
-                        'chm' => 'CHM Technician',
-                        'hardwareadmin' => 'Hardware Admin',
-                        'programmer' => 'Programmer',
-                    ])
+                Forms\Components\Select::make('role_id')
+                    ->relationship('role', 'name', fn (Builder $query) => $query->orderBy('id'))
+                    ->preload()
+                    ->searchable()
                     ->required(),
 
             ]);
@@ -78,7 +74,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('username')
                     ->label('PEN / Attendance ID')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('role')
+                Tables\Columns\TextColumn::make('role.name')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
@@ -95,12 +91,8 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('role')
-                    ->options([
-                        'superadmin' => 'SuperAdmin',
-                        'admin' => 'Admin',
-                        'chm' => 'CHM Technician',
-                    ])
+                Tables\Filters\SelectFilter::make('role_id')
+                    ->relationship('role', 'name')
                     ->multiple(),
             ])
             ->actions([
@@ -150,7 +142,9 @@ class UserResource extends Resource
     }
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('role', '!=', 'superadmin');
+        return parent::getEloquentQuery()->whereHas('role', function (Builder $query) {
+            $query->where('name', '!=', 'superadmin');
+        });
     }
 
     public static function canCreate(): bool

@@ -22,7 +22,7 @@ class SectionResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->check() && !in_array(strtolower(auth()->user()->role ?? ''), ['chm', 'hardwareadmin']);
+        return auth()->check() && !in_array(auth()->user()->getRoleName(), ['chm', 'hardwareadmin']);
     }
     protected static ?string $navigationGroup = 'Settings';
     protected static ?string $navigationLabel = 'Sections';

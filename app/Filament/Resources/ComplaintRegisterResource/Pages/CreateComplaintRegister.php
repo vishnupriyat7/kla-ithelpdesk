@@ -14,4 +14,19 @@ class CreateComplaintRegister extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function afterCreate(): void
+    {
+        $admins = \App\Models\User::whereHas('role', function ($query) {
+            $query->whereIn('name', ['superadmin', 'admin', 'hardwareadmin']);
+        })->get();
+
+        foreach ($admins as $admin) {
+            \Filament\Notifications\Notification::make()
+                ->title('New Complaint Raised')
+                ->body("A new ticket ({$this->record->ticket_no}) has been raised and is Open.")
+                ->warning()
+                ->sendToDatabase($admin);
+        }
+    }
 }

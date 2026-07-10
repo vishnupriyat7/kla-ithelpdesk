@@ -86,9 +86,9 @@ class ComplaintRegisterController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
         }
 
-        $role = strtolower(auth()->user()->role ?? '');
-        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin'])) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized. Only CHM, Programmer, and Admin technicians can process tickets.']);
+        $role = auth()->user()->getRoleName();
+        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Only CHM, Programmer, HardwareAdmin, and Admin technicians can process tickets.']);
         }
 
         $ticket->update([
@@ -105,9 +105,9 @@ class ComplaintRegisterController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthenticated.'], 401);
         }
 
-        $role = strtolower(auth()->user()->role ?? '');
-        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin'])) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized. Only CHM, Programmer, and Admin technicians can process tickets.']);
+        $role = auth()->user()->getRoleName();
+        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized. Only CHM, Programmer, HardwareAdmin, and Admin technicians can process tickets.']);
         }
 
         if ($ticket->technician_id !== auth()->id()) {

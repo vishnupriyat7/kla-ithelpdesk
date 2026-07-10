@@ -252,8 +252,9 @@ class ComplaintRegisterResource extends Resource
                             ->required()
                             ->columnSpanFull(),
                         Forms\Components\Select::make('technician_id')
-                            ->relationship('technician', 'name')
-                            ->label('Assigned Technician'),
+                            ->relationship('technician', 'name', fn (Builder $query) => $query->whereHas('role', fn($q) => $q->whereIn('name', ['chm', 'programmer'])))
+                            ->label('Assigned Technician')
+                            ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin'])),
                         Forms\Components\Textarea::make('remarks')
                             ->columnSpanFull(),
                     ])->columns(2),
@@ -449,6 +450,55 @@ class ComplaintRegisterResource extends Resource
                     ->icon('heroicon-m-pencil')
                     ->color('warning')
                     ->hiddenLabel(),
+                Tables\Actions\Action::make('whatsapp')
+                    ->label('WhatsApp')
+                    ->icon('heroicon-m-chat-bubble-left-ellipsis')
+                    ->color('success')
+                    ->hiddenLabel()
+                    ->url(function ($record) {
+                        $employeeName = static::resolveEmployeeName($record->employee_id);
+                        $location = ($record->location?->location ?? '-') . ' / ' . ($record->floor ?? '-') . ' / ' . ($record->room?->name ?? '-');
+                        $userName = auth()->user()->name;
+                        $message = "*{$userName}*\n\n";
+                        $message .= "*Ticket No:* {$record->ticket_no}";
+                        
+                        if ($employeeName && $employeeName !== '-' && $employeeName !== 'Not Provided') {
+                            $message .= "\n*Requested By:* {$employeeName}";
+                        }
+                        if ($record->section && $record->section !== '-') {
+                            $message .= "\n*Section:* {$record->section}";
+                        }
+                        
+                        $locParts = [];
+                        if ($record->location && $record->location->location && $record->location->location !== '-') $locParts[] = $record->location->location;
+                        if ($record->floor && $record->floor !== '-') $locParts[] = $record->floor;
+                        if ($record->room && $record->room->name && $record->room->name !== '-') $locParts[] = $record->room->name;
+                        
+                        $locStr = implode(' / ', $locParts);
+                        if ($locStr) {
+                            $message .= "\n*Location:* {$locStr}";
+                        }
+                        
+                        if ($record->complaint_type && $record->complaint_type !== '-') {
+                            $message .= "\n*Type:* {$record->complaint_type}";
+                        }
+                        if ($record->description && $record->description !== '-') {
+                            $message .= "\n*Problem:* {$record->description}";
+                        }
+                        
+                        $displayStatus = $record->status;
+                        if ($record->status === 'Complaint' && $record->vendor_complaint_id) {
+                            $displayStatus = "Complaint (No.{$record->vendor_complaint_id})";
+                        }
+                        $message .= "\n*Status:* {$displayStatus}";
+                        
+                        if ($record->technician) {
+                            $message .= "\n*Handled By:* {$record->technician->name}";
+                        }
+                        
+                        return 'https://wa.me/?text=' . urlencode($message);
+                    })
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -460,13 +510,17 @@ class ComplaintRegisterResource extends Resource
 
     public static function canCreate(): bool
     {
-        $role = strtolower(auth()->user()->role ?? '');
+        $role = auth()->user()->getRoleName();
         return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin']);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return auth()->check() && strtolower(auth()->user()->role ?? '') !== 'chm';
+        $role = auth()->user()->getRoleName();
+        if (in_array($role, ['admin', 'superadmin', 'hardwareadmin'])) {
+            return true;
+        }
+        return $record->technician_id === auth()->id();
     }
 
     public static function getRelations(): array
@@ -490,7 +544,7 @@ class ComplaintRegisterResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        $role = strtolower(auth()->user()->role ?? '');
+        $role = auth()->user()->getRoleName();
 
         // Admin, Superadmin, and Hardwareadmin can see all tickets. Others (like chm, programmer) only see their assigned tickets.
         if (!in_array($role, ['admin', 'superadmin', 'hardwareadmin'])) {

@@ -409,7 +409,8 @@
     let currentTab = 'Open';
     let selectedTicketId = null;
     const currentUserId = {{ auth() -> id() ?? 'null' }};
-    const canTakeTicket = {{ auth() -> check() && in_array(strtolower(auth() -> user() -> role ?? ''), ['chm', 'programmer', 'admin', 'superadmin']) ? 'true' : 'false' }};
+    const currentUserName = @json(auth()->user()->name ?? 'IT HelpDesk Ticket');
+    const canTakeTicket = {{ auth() -> check() && in_array(auth() -> user() -> getRoleName(), ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin']) ? 'true' : 'false' }};
 
     let employeeMap = {};
 
@@ -630,6 +631,57 @@
                 </button>
             `;
         }
+        
+        if (canTakeTicket) {
+            let displayStatus = t.status || '-';
+            if (t.status === 'Complaint' && t.vendor_complaint_id) {
+                displayStatus = `Complaint (No.${t.vendor_complaint_id})`;
+            }
+
+            let waMessage = `*${currentUserName}*\n\n`;
+            waMessage += `*Ticket No:* ${t.ticket_no || t.id}`;
+            
+            let empName = getEmployeeName(t.employee_id);
+            if (empName && empName !== '-' && empName !== 'Not Provided') {
+                waMessage += `\n*Requested By:* ${empName}`;
+            }
+            if (t.section && t.section !== '-') {
+                waMessage += `\n*Section:* ${t.section}`;
+            }
+            
+            let locParts = [];
+            let mainLoc = (t.location ? t.location.location : t.office_location_id);
+            if (mainLoc && mainLoc !== '-') locParts.push(mainLoc);
+            if (t.floor && t.floor !== '-') locParts.push(t.floor);
+            let roomName = (t.room ? t.room.name : t.room_id);
+            if (roomName && roomName !== '-') locParts.push(roomName);
+            
+            let locStr = locParts.join(' / ');
+            if (locStr) {
+                waMessage += `\n*Location:* ${locStr}`;
+            }
+            
+            if (t.complaint_type && t.complaint_type !== '-') {
+                waMessage += `\n*Type:* ${t.complaint_type}`;
+            }
+            if (t.description && t.description !== '-') {
+                waMessage += `\n*Problem:* ${t.description}`;
+            }
+            
+            waMessage += `\n*Status:* ${displayStatus}`;
+            
+            if (t.technician) {
+                waMessage += `\n*Handled By:* ${t.technician.name}`;
+            }
+
+            let waUrl = 'https://wa.me/?text=' + encodeURIComponent(waMessage);
+
+            actionButtons = `
+                <a href="${waUrl}" target="_blank" class="btn btn-sm me-2" style="background-color: #25D366; color: white; border: none;" title="Push to WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                </a>
+            ` + actionButtons;
+        }
 
         let headerHtml = `
             <div class="chat-main-header w-100 d-flex flex-column" style="background-color: #f0f2f5; padding: 15px 20px; border-bottom: 1px solid #d1d7db;">
@@ -658,6 +710,16 @@
             </div>
         `;
 
+        let assignmentStatusStr = `<span class="badge" style="background-color: #fffbeb; color: #b45309; border: 1px solid #fef3c7;"><i class="bi bi-person-dash me-1"></i> Unassigned</span>`;
+        if (t.technician) {
+            let actionVerb = 'Assigned to';
+            if (t.status === 'Pending') actionVerb = 'Pending with';
+            if (t.status === 'Complaint') actionVerb = 'Complaint handled by';
+            if (t.status === 'Resolved' || t.status === 'Closed') actionVerb = 'Resolved by';
+            
+            assignmentStatusStr = `<span class="badge" style="background-color: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1;"><i class="bi bi-person-check-fill me-1"></i> ${actionVerb} ${t.technician.name}</span>`;
+        }
+
         let bodyHtml = `
             <div class="chat-main-body">
                 <div class="bg-white p-3 rounded shadow-sm border mb-3" style="border-color: #e9edef !important; max-width: 95%;">
@@ -685,7 +747,7 @@
                         <div class="col-12 mt-3 pt-3 border-top">
                             <div class="d-flex align-items-center">
                                 <small class="text-muted text-uppercase fw-bold me-3" style="font-size: 10px; letter-spacing: 0.5px;">Assignment Status</small>
-                                ${t.technician ? `<span class="badge" style="background-color: #f0fdfa; color: #0f766e; border: 1px solid #ccfbf1;"><i class="bi bi-person-check-fill me-1"></i> Assigned to ${t.technician.name}</span>` : `<span class="badge" style="background-color: #fffbeb; color: #b45309; border: 1px solid #fef3c7;"><i class="bi bi-person-dash me-1"></i> Unassigned</span>`}
+                                ${assignmentStatusStr}
                             </div>
                         </div>
                     </div>

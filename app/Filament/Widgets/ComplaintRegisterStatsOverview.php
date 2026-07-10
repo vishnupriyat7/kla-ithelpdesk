@@ -12,7 +12,7 @@ class ComplaintRegisterStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $role = strtolower(auth()->user()->role ?? '');
+        $role = auth()->user()->getRoleName();
         $userId = auth()->id();
 
         // 1. GLOBAL STATS (Shown to everyone)

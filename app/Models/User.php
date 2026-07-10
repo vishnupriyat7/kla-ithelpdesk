@@ -24,7 +24,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'username',
         'password',
-        'role',
+        'role_id',
     ];
 
     /**
@@ -36,10 +36,6 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'remember_token',
     ];
-    // public function canAccessFilament(): bool
-    // {
-    //     return str_ends_with($this->email, 'admin@yourdomain.com') && $this->hasVerifiedEmail();
-    // }
 
     /**
      * Get the attributes that should be cast.
@@ -54,6 +50,11 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
     /**
      * Determine if the user can access the Filament panel.
      *
@@ -62,10 +63,28 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return in_array(strtolower($this->role ?? ''), ['superadmin', 'chm', 'programmer', 'hardwareadmin']);
+        if (is_string($this->role)) {
+            return in_array(strtolower($this->role), ['superadmin', 'chm', 'programmer', 'hardwareadmin']);
+        }
+
+        $roleName = $this->role ? strtolower($this->role->name) : '';
+        return in_array($roleName, ['superadmin', 'chm', 'programmer', 'hardwareadmin']);
     }
+    
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'superadmin';
+        if (is_string($this->role)) {
+            return $this->role === 'superadmin';
+        }
+        
+        return $this->role && $this->role->name === 'superadmin';
+    }
+
+    public function getRoleName(): string
+    {
+        if (is_string($this->role)) {
+            return strtolower($this->role);
+        }
+        return $this->role ? strtolower($this->role->name) : '';
     }
 }

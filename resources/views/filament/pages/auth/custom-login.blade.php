@@ -89,16 +89,16 @@
         .custom-subtitle { font-size: 1.5rem; }
     }
 
-    /* Right pane (Form) */
+    /* Right pane (Form) - Dark Theme with Grey Card */
     .custom-login-right {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 2rem;
-        background-color: #111827;
+        background-color: #111827; /* gray-900 */
         z-index: 20;
-        border-left: 1px solid #1f2937;
+        border-left: 1px solid #1f2937; /* gray-800 */
     }
     @media (min-width: 1024px) {
         .custom-login-right { width: 40%; }
@@ -107,10 +107,9 @@
         width: 100%;
         max-width: 28rem;
         padding: 2.5rem;
-        background-color: rgba(31, 41, 55, 0.5); /* bg-gray-800/50 */
-        backdrop-filter: blur(12px);
+        background-color: #1f2937; /* gray-800 */
         border-radius: 1rem;
-        border: 1px solid #374151; /* border-gray-700 */
+        border: 1px solid #374151; /* gray-700 */
         box-shadow: 0 0 40px rgba(0,0,0,0.3);
     }
     .custom-login-header {
@@ -145,7 +144,7 @@
         color: #e5e7eb !important; /* text-gray-200 */
     }
     .fi-input-wrp {
-        background-color: rgba(31, 41, 55, 0.8) !important; /* bg-gray-800 */
+        background-color: #374151 !important; /* bg-gray-700 */
         border-color: #4b5563 !important; /* border-gray-600 */
         color: #ffffff !important;
     }
@@ -159,7 +158,7 @@
     
     /* Checkbox for Remember Me */
     .fi-checkbox-input {
-        background-color: rgba(31, 41, 55, 0.8) !important;
+        background-color: #374151 !important;
         border-color: #4b5563 !important;
     }
     .fi-checkbox-input:checked {

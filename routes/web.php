@@ -6,30 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ComplaintRegisterController;
 
-Route::get('/', [HomeController::class, 'index'])->name('home.index');
-Route::get('/index-other', [HomeController::class, 'indexOther'])->name('home.index-other');
-Route::get('/updatesmore', [HomeController::class, 'updatesMore'])->name('updatesmore');
-Route::get('/order-circular/{type}', [HomeController::class, 'orderCircular'])->name('home.order-circular');
-Route::get('/search', [HomeController::class, 'search'])->name('home.search');
-
-Route::get('/upload-request', [HomeController::class, 'uploadRequest'])->name('home.upload-request');
-Route::post('/upload-request/save', [HomeController::class, 'storeUploadRequest'])->name('home.store-upload-request');
-Route::get('/upload-request/check-status', action: [HomeController::class, 'checkStatus'])->name('home.check-upload-request');
-Route::get('/advanced-search', [HomeController::class, 'advancedSearch'])->name('home.advanced-search');
-
-//Complaint Register
-Route::get('/employees/list', [EmployeeController::class, 'list']);
-
-
-Route::get('/employees', [EmployeeController::class, 'index'])->name('home.employees');
-Route::get('/employees/data', [EmployeeController::class, 'getEmployees'])->name('employees.data');
-Route::get('/employees/{attendanceId}', [EmployeeController::class, 'employeeShow'])->name('employees.show');
-// Retired Staff
-Route::get('/retired-staff', [EmployeeController::class, 'retiredStaff'])->name('home.retired-staff');
-Route::get('/retired-staff/data', [EmployeeController::class, 'getRetiredEmployees'])->name('retired-staff.data');
-Route::get('/retired-staff/{id}', [EmployeeController::class, 'retiredStaffShow'])->name('retired-staff.show');
-
 // IT Complaint Register routes for dynamic dropdowns
+Route::get('/employees/list', [EmployeeController::class, 'list']);
 
 Route::get('/get-floors/{location}', [ComplaintRegisterController::class, 'getFloors']);
 Route::get('/get-rooms/{location}/{floor}', [ComplaintRegisterController::class, 'getRooms']);

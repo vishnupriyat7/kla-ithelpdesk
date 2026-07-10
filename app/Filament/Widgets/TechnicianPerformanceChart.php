@@ -13,7 +13,7 @@ class TechnicianPerformanceChart extends ChartWidget
 
     public static function canView(): bool
     {
-        return auth()->check() && strtolower(auth()->user()->role ?? '') !== 'chm';
+        return auth()->check() && auth()->user()->getRoleName() !== 'chm';
     }
 
     protected function getData(): array

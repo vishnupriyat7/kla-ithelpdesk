@@ -89,7 +89,7 @@ class VendorComplaintResource extends Resource
                             ])
                             ->columns(2)
                             ->columnSpanFull()
-                            ->disabled(fn() => strtolower(auth()->user()->role ?? '') === 'chm')
+                            ->disabled(fn() => auth()->user()->getRoleName() === 'chm')
                             ->defaultItems(0),
                     ])->columns(2),
             ]);
