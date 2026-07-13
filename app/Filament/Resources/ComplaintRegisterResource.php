@@ -191,19 +191,20 @@ class ComplaintRegisterResource extends Resource
                             }),
                         Forms\Components\Select::make('complaint_type')
                             ->options([
-                                'Hardware' => 'Hardware',
+                                'Computer' => 'Computer',
                                 'Software' => 'Software',
                                 'Network' => 'Network',
                                 'Printer' => 'Printer',
                                 'Email' => 'Email',
+                                'E-Office' => 'E-Office',
                             ])
                             ->required(),
                     ])->columns(2),
                 Forms\Components\Section::make('Location Details')
                     ->schema([
                         Forms\Components\Select::make('office_location_id')
-                            ->relationship('location', 'location')
                             ->label('Building')
+                            ->options(fn() => \App\Models\OfficeLocation::pluck('location', 'id'))
                             ->live()
                             ->afterStateUpdated(function (Forms\Set $set) {
                                 $set('floor', null);
@@ -217,15 +218,13 @@ class ComplaintRegisterResource extends Resource
                                 if (! $locationId) {
                                     return [];
                                 }
-                                $roomFloors = \App\Models\Room::where('office_location_id', $locationId)
-                                    ->whereNotNull('floor')
-                                    ->pluck('floor');
-                                $floors = \App\Models\Floor::whereIn('name', $roomFloors)
+                                $roomFloorIds = \App\Models\Room::where('office_location_id', $locationId)
+                                    ->whereNotNull('floor_id')
+                                    ->pluck('floor_id');
+                                $floors = \App\Models\Floor::whereIn('id', $roomFloorIds)
                                     ->orderBy('sort_order')
-                                    ->pluck('name');
-                                $missing = $roomFloors->diff($floors);
-                                $floors = $floors->concat($missing)->unique();
-                                return $floors->mapWithKeys(fn ($f) => [$f => $f])->toArray();
+                                    ->pluck('name', 'name');
+                                return $floors->toArray();
                             })
                             ->live()
                             ->afterStateUpdated(fn (Forms\Set $set) => $set('room_id', null))
@@ -234,12 +233,15 @@ class ComplaintRegisterResource extends Resource
                             ->label('Room')
                             ->options(function (Forms\Get $get) {
                                 $locationId = $get('office_location_id');
-                                $floor = $get('floor');
-                                if (! $locationId || ! $floor) {
+                                $floorName = $get('floor');
+                                if (! $locationId || ! $floorName) {
                                     return [];
                                 }
+                                $floor = \App\Models\Floor::where('name', $floorName)->first();
+                                if (!$floor) return [];
+
                                 return \App\Models\Room::where('office_location_id', $locationId)
-                                    ->where('floor', $floor)
+                                    ->where('floor_id', $floor->id)
                                     ->orderBy('name')
                                     ->pluck('name', 'id')
                                     ->toArray();
@@ -449,11 +451,12 @@ class ComplaintRegisterResource extends Resource
                     ]),
                 Tables\Filters\SelectFilter::make('complaint_type')
                     ->options([
-                        'Hardware' => 'Hardware',
+                        'Computer' => 'Computer',
                         'Software' => 'Software',
                         'Network' => 'Network',
                         'Printer' => 'Printer',
                         'Email' => 'Email',
+                        'E-Office' => 'E-Office',
                     ]),
                 Tables\Filters\Filter::make('created_at')
                     ->form([

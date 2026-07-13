@@ -46,10 +46,9 @@ class RoomResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Select::make('office_location_id')
                     ->label('Building')
-                    ->relationship('location', 'location')
+                    ->options(fn() => \App\Models\OfficeLocation::pluck('location', 'id'))
                     ->required()
-                    ->searchable()
-                    ->preload(),
+                    ->searchable(),
                 Forms\Components\Toggle::make('is_office')
                     ->label('Is this an office?')
                     ->default(true),
@@ -83,7 +82,7 @@ class RoomResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('office_location_id')
                     ->label('Building')
-                    ->relationship('location', 'location'),
+                    ->options(fn() => \App\Models\OfficeLocation::pluck('location', 'id')),
                 Tables\Filters\SelectFilter::make('floor_id')
                     ->label('Floor')
                     ->relationship('floorLevel', 'name', fn (Builder $query) => $query->orderBy('sort_order')),

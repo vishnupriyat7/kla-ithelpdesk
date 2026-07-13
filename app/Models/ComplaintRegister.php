@@ -69,9 +69,22 @@ class ComplaintRegister extends Model
             $techChanged = $ticket->wasChanged('technician_id');
 
             if ($isNew || $statusChanged || $remarksChanged || $techChanged) {
+                $newStatus = $ticket->status ?? 'Open';
+                $newRemarks = $ticket->remarks ?? ($isNew ? 'Ticket created' : 'Status/Remarks updated');
+                
+                // Prevent duplicate status history if Filament calls save() multiple times
+                $lastHistory = $ticket->statusHistories()->latest()->first();
+                if ($lastHistory && 
+                    $lastHistory->status === $newStatus && 
+                    $lastHistory->remarks === $newRemarks && 
+                    $lastHistory->technician_id === $ticket->technician_id
+                ) {
+                    return;
+                }
+
                 $ticket->statusHistories()->create([
-                    'status' => $ticket->status ?? 'Open',
-                    'remarks' => $ticket->remarks ?? ($isNew ? 'Ticket created' : 'Status/Remarks updated'),
+                    'status' => $newStatus,
+                    'remarks' => $newRemarks,
                     'technician_id' => $ticket->technician_id,
                 ]);
             }
