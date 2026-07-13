@@ -36,10 +36,12 @@ class RoomResource extends Resource
                     ->label('Room Name/Number')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('floor')
-                    ->options(fn () => \App\Models\Floor::orderBy('sort_order')->pluck('name', 'name')->toArray())
+                Forms\Components\Select::make('floor_id')
+                    ->label('Floor')
+                    ->relationship('floorLevel', 'name', fn (Builder $query) => $query->orderBy('sort_order'))
                     ->required()
-                    ->searchable(),
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\TextInput::make('block')
                     ->maxLength(255),
                 Forms\Components\Select::make('office_location_id')
@@ -64,7 +66,8 @@ class RoomResource extends Resource
                     ->label('Room')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('floor')
+                Tables\Columns\TextColumn::make('floorLevel.name')
+                    ->label('Floor')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('location.location')
@@ -81,8 +84,9 @@ class RoomResource extends Resource
                 Tables\Filters\SelectFilter::make('office_location_id')
                     ->label('Building')
                     ->relationship('location', 'location'),
-                Tables\Filters\SelectFilter::make('floor')
-                    ->options(fn () => \App\Models\Floor::orderBy('sort_order')->pluck('name', 'name')->toArray()),
+                Tables\Filters\SelectFilter::make('floor_id')
+                    ->label('Floor')
+                    ->relationship('floorLevel', 'name', fn (Builder $query) => $query->orderBy('sort_order')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

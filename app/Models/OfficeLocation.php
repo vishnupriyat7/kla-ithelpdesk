@@ -12,6 +12,13 @@ class OfficeLocation extends Model
 
     protected $fillable = ['location', 'administrative_office_id'];
 
+    protected static function booted()
+    {
+        static::addGlobalScope('order', function ($builder) {
+            $builder->orderBy('administrative_office_id')->orderBy('id');
+        });
+    }
+
     public function office()
     {
         return $this->belongsTo(AdministrativeOffice::class, 'administrative_office_id');

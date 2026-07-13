@@ -42,5 +42,14 @@ class DatabaseSeeder extends Seeder
                 'role_id' => 1,
             ]
         );
+
+        // Call generated seeders for production master data
+        $this->call([
+            AdministrativeOfficesTableSeeder::class,
+            OfficeLocationsTableSeeder::class,
+            FloorsTableSeeder::class,
+            RoomsTableSeeder::class,
+            SectionsTableSeeder::class,
+        ]);
     }
 }
