@@ -9,6 +9,17 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('roles')) {
+            Schema::create('roles', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('guard_name')->default('web');
+                $table->timestamps();
+                
+                $table->unique(['name', 'guard_name']);
+            });
+        }
+
         // 1. Make sure all roles exist in the roles table
         $existingRoles = DB::table('roles')->pluck('id', 'name')->toArray();
         $userRoles = DB::table('users')->distinct()->pluck('role')->toArray();
