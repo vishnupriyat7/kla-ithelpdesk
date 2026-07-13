@@ -20,24 +20,19 @@ class EditComplaintRegister extends EditRecord
     protected $technicianAssigned = false;
     protected $newTechnicianId = null;
 
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function mutateRecordDataBeforeSave(array $data): array
     {
         $oldTechnicianId = $this->record->technician_id;
-        
         if (isset($data['technician_id']) && $data['technician_id'] != $oldTechnicianId) {
             $this->technicianAssigned = true;
             $this->newTechnicianId = $data['technician_id'];
         }
-        
         return $data;
     }
 
     protected function afterSave(): void
     {
-        if ($this->technicianAssigned) {
-            if ($this->record->status === 'Open') {
-                $this->record->update(['status' => 'Assigned']);
-            }
+        if ($this->technicianAssigned && !empty($this->newTechnicianId)) {
 
             $technician = \App\Models\User::find($this->newTechnicianId);
             if ($technician) {

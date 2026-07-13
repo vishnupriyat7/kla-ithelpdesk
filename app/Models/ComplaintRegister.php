@@ -62,6 +62,16 @@ class ComplaintRegister extends Model
             }
         });
 
+        static::updating(function ($ticket) {
+            if ($ticket->isDirty('technician_id') && !$ticket->isDirty('status')) {
+                if (empty($ticket->technician_id) && $ticket->getOriginal('status') === 'Assigned') {
+                    $ticket->status = 'Open';
+                } elseif (!empty($ticket->technician_id) && $ticket->getOriginal('status') === 'Open') {
+                    $ticket->status = 'Assigned';
+                }
+            }
+        });
+
         static::saved(function ($ticket) {
             $isNew = $ticket->wasRecentlyCreated;
             $statusChanged = $ticket->wasChanged('status');

@@ -73,10 +73,18 @@ class ComplaintRegisterResource extends Resource
                             ->disabled()
                             ->hiddenOn('create')
                             ->dehydrated(false),
-                        Forms\Components\TextInput::make('status')
-                            ->disabled()
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'Open' => 'Open',
+                                'Assigned' => 'Assigned',
+                                'Pending' => 'Pending',
+                                'Complaint' => 'Complaint',
+                                'Resolved' => 'Resolved',
+                                'Closed' => 'Closed',
+                            ])
+                            ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin']))
                             ->hiddenOn('create')
-                            ->dehydrated(false),
+                            ->dehydrated(fn () => in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin'])),
                         Forms\Components\Select::make('section')
                             ->label('Section')
                             ->options(function (Forms\Get $get) {
