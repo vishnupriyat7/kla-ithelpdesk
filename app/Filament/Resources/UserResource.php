@@ -28,7 +28,7 @@ class UserResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return Auth::check() && Auth::user()->isSuperAdmin();
+        return Auth::check() && (Auth::user()->isSuperAdmin() || Auth::user()->isHardwareAdmin());
     }
 
     public static function form(Form $form): Form
@@ -115,7 +115,7 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn() => Auth::user()->isSuperAdmin()),
+                    ->visible(fn() => Auth::user()->isSuperAdmin() || Auth::user()->isHardwareAdmin()),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -149,6 +149,6 @@ class UserResource extends Resource
 
     public static function canCreate(): bool
     {
-        return Auth::check() && Auth::user()->isSuperAdmin();
+        return Auth::check() && (Auth::user()->isSuperAdmin() || Auth::user()->isHardwareAdmin());
     }
 }

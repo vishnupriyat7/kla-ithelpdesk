@@ -80,6 +80,15 @@ class User extends Authenticatable implements FilamentUser
         return $this->role && $this->role->name === 'superadmin';
     }
 
+    public function isHardwareAdmin(): bool
+    {
+        if (is_string($this->role)) {
+            return strtolower($this->role) === 'hardwareadmin';
+        }
+        
+        return $this->role && strtolower($this->role->name) === 'hardwareadmin';
+    }
+
     public function getRoleName(): string
     {
         if (is_string($this->role)) {
