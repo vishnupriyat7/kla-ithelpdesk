@@ -21,7 +21,7 @@ class ComplaintRegisterStatsOverview extends BaseWidget
         $gAssigned = ComplaintRegister::where('status', 'Assigned')->count();
         $gPending = ComplaintRegister::where('status', 'Pending')->count();
         $gComplaint = ComplaintRegister::where('status', 'Complaint')->count();
-        $gClosed = ComplaintRegister::where('status', 'Closed')->count();
+        $gResolvedTotal = ComplaintRegister::where('status', 'Resolved')->count();
         
         $gResolved = ComplaintRegister::where('status', 'Resolved')->whereDate('updated_at', today())->count();
 
@@ -44,8 +44,8 @@ class ComplaintRegisterStatsOverview extends BaseWidget
                     <strong style="font-size: 0.875rem;">' . $gComplaint . '</strong>
                 </div>
                 <div style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
-                    <span style="font-weight: 500; font-size: 0.75rem;">Closed</span>
-                    <strong style="font-size: 0.875rem;">' . $gClosed . '</strong>
+                    <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
+                    <strong style="font-size: 0.875rem;">' . $gResolvedTotal . '</strong>
                 </div>
             </div>
         ');
@@ -66,9 +66,9 @@ class ComplaintRegisterStatsOverview extends BaseWidget
                 
             Stat::make('Vendor Complaints', \App\Models\VendorComplaint::count())
                 ->description(new \Illuminate\Support\HtmlString(
-                    '<span style="color: #ef4444;">New: ' . \App\Models\VendorComplaint::where('status', 'New')->count() . '</span> | ' .
-                    '<span style="color: #f59e0b;">Pending: ' . \App\Models\VendorComplaint::whereIn('status', ['Pending', 'Pending Spare'])->count() . '</span> | ' .
-                    '<span style="color: #22c55e;">Closed: ' . \App\Models\VendorComplaint::where('status', 'Closed')->count() . '</span>'
+                    '<span style="color: #ef4444;">Un attended: ' . \App\Models\VendorComplaint::where('status', 'Un attended')->count() . '</span> | ' .
+                    '<span style="color: #f59e0b;">Pending Spare: ' . \App\Models\VendorComplaint::where('status', 'Pending Spare')->count() . '</span> | ' .
+                    '<span style="color: #22c55e;">Resolved: ' . \App\Models\VendorComplaint::where('status', 'Resolved')->count() . '</span>'
                 ))
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
@@ -83,7 +83,7 @@ class ComplaintRegisterStatsOverview extends BaseWidget
             $mAssigned = (clone $myQuery)->where('status', 'Assigned')->count();
             $mPending = (clone $myQuery)->where('status', 'Pending')->count();
             $mComplaint = (clone $myQuery)->where('status', 'Complaint')->count();
-            $mClosed = (clone $myQuery)->where('status', 'Closed')->count();
+            $mResolved = (clone $myQuery)->where('status', 'Resolved')->count();
 
             $myBadges = new \Illuminate\Support\HtmlString('
                 <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; width: 100%;">
@@ -100,8 +100,8 @@ class ComplaintRegisterStatsOverview extends BaseWidget
                         <strong style="font-size: 0.875rem;">' . $mComplaint . '</strong>
                     </div>
                     <div style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
-                        <span style="font-weight: 500; font-size: 0.75rem;">Closed</span>
-                        <strong style="font-size: 0.875rem;">' . $mClosed . '</strong>
+                        <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
+                        <strong style="font-size: 0.875rem;">' . $mResolved . '</strong>
                     </div>
                 </div>
             ');

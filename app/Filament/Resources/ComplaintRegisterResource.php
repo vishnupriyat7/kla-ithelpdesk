@@ -487,16 +487,74 @@ class ComplaintRegisterResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->icon('heroicon-m-eye')
                     ->color('info')
-                    ->hiddenLabel(),
+                    ->hiddenLabel()
+                    ->tooltip('View Ticket'),
                 Tables\Actions\EditAction::make()
                     ->icon('heroicon-m-pencil')
                     ->color('warning')
-                    ->hiddenLabel(),
+                    ->hiddenLabel()
+                    ->tooltip('Edit Ticket'),
+                Tables\Actions\Action::make('createVendorComplaint')
+                    ->label('Log Vendor Complaint')
+                    ->icon('heroicon-m-exclamation-triangle')
+                    ->color('danger')
+                    ->hiddenLabel()
+                    ->tooltip('Create Vendor Complaint')
+                    ->visible(fn (\App\Models\ComplaintRegister $record) => empty($record->vendor_complaint_id) && in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin', 'chm']))
+                    ->form([
+                        \Filament\Forms\Components\Select::make('vendor')
+                            ->label('Vendor')
+                            ->options([
+                                'IHRD' => 'IHRD',
+                                'Lipi' => 'Lipi',
+                                'Aser' => 'Aser',
+                            ])
+                            ->required(),
+                        \Filament\Forms\Components\TextInput::make('vendor_complaint_no')
+                            ->label('Vendor Complaint No')
+                            ->unique('vendor_complaints', 'vendor_complaint_no')
+                            ->required(),
+                        \Filament\Forms\Components\Textarea::make('complaint_description')
+                            ->label('Complaint Description')
+                            ->required(),
+                        \Filament\Forms\Components\Select::make('status')
+                            ->options([
+                                'Un attended' => 'Un attended',
+                                'Pending Spare' => 'Pending Spare',
+                                'Resolved' => 'Resolved',
+                            ])
+                            ->default('Un attended')
+                            ->required(),
+                        \Filament\Forms\Components\Textarea::make('chm_remark')
+                            ->label('Remarks')
+                            ->columnSpanFull(),
+                    ])
+                    ->action(function (array $data, \App\Models\ComplaintRegister $record) {
+                        \App\Models\VendorComplaint::create([
+                            'complaint_ticket_id' => $record->id,
+                            'vendor' => $data['vendor'],
+                            'vendor_complaint_no' => $data['vendor_complaint_no'],
+                            'complaint_description' => $data['complaint_description'],
+                            'status' => $data['status'],
+                            'chm_remark' => $data['chm_remark'] ?? null,
+                        ]);
+                        
+                        $record->update([
+                            'vendor_complaint_id' => $data['vendor_complaint_no'],
+                            'status' => 'Complaint'
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Vendor Complaint Created Successfully')
+                            ->success()
+                            ->send();
+                    }),
                 Tables\Actions\Action::make('whatsapp')
                     ->label('WhatsApp')
-                    ->icon('heroicon-m-chat-bubble-left-ellipsis')
+                    ->icon(new \Illuminate\Support\HtmlString('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="fi-ac-icon h-4 w-4 text-success-500"><path d="M12.031 0C5.385 0 0 5.386 0 12.032c0 2.12.553 4.195 1.603 6.012L.15 24l6.103-1.603a11.96 11.96 0 005.778 1.488h.005c6.645 0 12.03-5.386 12.03-12.032C24.066 5.386 18.679 0 12.031 0zm.005 21.895a9.98 9.98 0 01-5.086-1.39l-.364-.216-3.784.992.993-3.69-.237-.377a9.973 9.973 0 01-1.528-5.328c0-5.512 4.488-10 10.005-10 5.517 0 10 4.488 10 10 0 5.511-4.483 10-10 10zm5.492-7.513c-.301-.151-1.782-.879-2.059-.979-.276-.1-.477-.151-.678.151-.201.302-.779.979-.955 1.18-.176.201-.352.226-.653.075-2.225-1.117-3.6-2.584-4.577-4.275-.176-.302.176-.276.477-.879.1-.2.05-.377-.025-.528-.075-.151-.678-1.632-.93-2.235-.246-.59-.497-.502-.678-.502-.176 0-.377 0-.578 0-.201 0-.528.075-.804.377-.276.302-1.055 1.03-1.055 2.512s1.08 2.914 1.231 3.115c.151.201 2.135 3.265 5.174 4.57 2.378 1.021 3.254.912 3.864.753.844-.22 1.782-.728 2.034-1.432.251-.703.251-1.306.176-1.432-.075-.126-.276-.201-.578-.352z"/></svg>'))
                     ->color('success')
                     ->hiddenLabel()
+                    ->tooltip('Send via WhatsApp')
                     ->url(function ($record) {
                         $employeeName = static::resolveEmployeeName($record->employee_id);
                         $location = ($record->location?->location ?? '-') . ' / ' . ($record->floor ?? '-') . ' / ' . ($record->room?->name ?? '-');

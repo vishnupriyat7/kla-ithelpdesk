@@ -52,9 +52,9 @@ class VendorComplaintResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('status')
                             ->options([
-
+                                'Un attended' => 'Un attended',
                                 'Pending Spare' => 'Pending Spare',
-                                'Closed' => 'Closed',
+                                'Resolved' => 'Resolved',
                             ])
                             ->required(),
                         Forms\Components\Textarea::make('complaint_description')
@@ -109,7 +109,7 @@ class VendorComplaintResource extends Resource
                 Tables\Columns\TextColumn::make('complaintTicket.ticket_no')
                     ->label('Internal Ticket No')
                     ->badge()
-                    ->url(fn ($record) => $record->complaint_ticket_id ? \App\Filament\Resources\ComplaintRegisterResource::getUrl('view', ['record' => $record->complaint_ticket_id]) : null)
+                    ->url(fn($record) => $record->complaint_ticket_id ? \App\Filament\Resources\ComplaintRegisterResource::getUrl('view', ['record' => $record->complaint_ticket_id]) : null)
                     ->color('primary')
                     ->searchable()
                     ->sortable(),
@@ -123,10 +123,9 @@ class VendorComplaintResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        'New' => 'danger',
-                        'Pending' => 'warning',
+                        'Un attended' => 'danger',
                         'Pending Spare' => 'warning',
-                        'Closed' => 'success',
+                        'Resolved' => 'success',
                         default => 'secondary',
                     })
                     ->searchable(),
@@ -150,10 +149,9 @@ class VendorComplaintResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'New' => 'New',
-                        'Pending' => 'Pending',
+                        'Un attended' => 'Un attended',
                         'Pending Spare' => 'Pending Spare',
-                        'Closed' => 'Closed',
+                        'Resolved' => 'Resolved',
                     ]),
             ])
             ->actions([
