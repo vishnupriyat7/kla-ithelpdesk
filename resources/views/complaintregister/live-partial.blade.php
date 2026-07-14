@@ -406,7 +406,7 @@
 
 <script>
     let allTickets = [];
-    let currentTab = 'Open';
+    let currentTab = '{{ request()->query('status', 'Open') }}';
     let selectedTicketId = null;
     const currentUserId = {{ auth() -> id() ?? 'null' }};
     const currentUserName = @json(auth()->user()->name ?? 'IT HelpDesk Ticket');
@@ -432,7 +432,7 @@
             .then(data => {
                 allTickets = data;
                 updateCounts();
-                renderTickets();
+                setTab(currentTab);
 
                 // If a ticket is currently selected, re-render its details
                 if (selectedTicketId) {
@@ -667,12 +667,15 @@
             if (t.description && t.description !== '-') {
                 waMessage += `\n*Problem:* ${t.description}`;
             }
+            let statusEmoji = '';
+            if (t.status === 'Resolved') statusEmoji = '\u{2705}';
+            else if (t.status === 'Pending') statusEmoji = '\u{23F3}';
+            else if (t.status === 'Complaint') statusEmoji = '\u{26A0}';
+            else if (t.status === 'Assigned') statusEmoji = '\u{1F7E1}';
+            else if (t.status === 'Open') statusEmoji = '\u{1F534}';
             
-            waMessage += `\n*Status:* ${displayStatus}`;
-            
-            if (t.technician) {
-                waMessage += `\n*Handled By:* ${t.technician.name}`;
-            }
+            let finalStatusStr = `${displayStatus} ${statusEmoji}`.trim();
+            waMessage += `\n\n*Status:* ${finalStatusStr}`;
 
             let waUrl = 'https://wa.me/?text=' + encodeURIComponent(waMessage);
 
@@ -812,7 +815,6 @@
                         let locationStr = locationParts.join(' / ');
 
                         let waMessage = `*Ticket Taken by ${assignedName}*\n`;
-                        waMessage += `━━━━━━━━━━━━━━━━━━━━━\n`;
                         waMessage += `*Ticket No:*   [${t.ticket_no}]\n`;
                         waMessage += `*Section:*     ${t.section || 'N/A'}\n`;
                         if (locationStr) waMessage += `*Location / Room:* ${locationStr}\n`;
@@ -903,8 +905,7 @@
                     
                     const t = allTickets.find(ticket => ticket.id == id);
                     if (t) {
-                        let waMessage = `${data.updated_by}\n`;
-                        waMessage += `━━━━━━━━━━━━━━━━━━━━━\n`;
+                        let waMessage = `*${data.updated_by}*\n`;
                         waMessage += `*Ticket No:*   [${t.ticket_no}]\n`;
                         if (vendor_complaint_id) {
                             waMessage += `*Vendor:*      ${vendor_name}\n`;
@@ -914,8 +915,15 @@
                             waMessage += `*Remarks:* _${remarks}_\n`;
                         }
                         
-                        let displayStatus = status === 'Resolved' ? 'Resolved ✅' : status;
-                        waMessage += `\n*Status:*      ${displayStatus}`;
+                        let statusEmoji = '';
+                        if (status === 'Resolved') statusEmoji = '\u{2705}';
+                        else if (status === 'Pending') statusEmoji = '\u{23F3}';
+                        else if (status === 'Complaint') statusEmoji = '\u{26A0}';
+                        else if (status === 'Assigned') statusEmoji = '\u{1F7E1}';
+                        else if (status === 'Open') statusEmoji = '\u{1F534}';
+                        
+                        let finalStatusStr = `${status} ${statusEmoji}`.trim();
+                        waMessage += `\n\n*Status:*      ${finalStatusStr}`;
                         
                         document.getElementById('btnUpdateWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
                         document.getElementById('updateSuccessMessage').innerText = data.message;

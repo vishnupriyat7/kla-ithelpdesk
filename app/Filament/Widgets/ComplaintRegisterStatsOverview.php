@@ -25,28 +25,29 @@ class ComplaintRegisterStatsOverview extends BaseWidget
         
         $gResolved = ComplaintRegister::where('status', 'Resolved')->whereDate('updated_at', today())->count();
 
+        $url = url('/admin/complaint-live-screen');
         $globalBadges = new \Illuminate\Support\HtmlString('
             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; width: 100%;">
-                <div style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                <a href="' . $url . '?status=Open" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Open</span>
                     <strong style="font-size: 0.875rem;">' . $gOpen . '</strong>
-                </div>
-                <div style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                </a>
+                <a href="' . $url . '?status=Assigned" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Assigned</span>
                     <strong style="font-size: 0.875rem;">' . $gAssigned . '</strong>
-                </div>
-                <div style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                </a>
+                <a href="' . $url . '?status=Pending" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Pending</span>
                     <strong style="font-size: 0.875rem;">' . $gPending . '</strong>
-                </div>
-                <div style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                </a>
+                <a href="' . $url . '?status=Complaint" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Complaint</span>
                     <strong style="font-size: 0.875rem;">' . $gComplaint . '</strong>
-                </div>
-                <div style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                </a>
+                <a href="' . $url . '?status=Resolved" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
                     <strong style="font-size: 0.875rem;">' . $gResolvedTotal . '</strong>
-                </div>
+                </a>
             </div>
         ');
 
@@ -87,22 +88,22 @@ class ComplaintRegisterStatsOverview extends BaseWidget
 
             $myBadges = new \Illuminate\Support\HtmlString('
                 <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; width: 100%;">
-                    <div style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                    <a href="' . $url . '?status=Assigned" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                         <span style="font-weight: 500; font-size: 0.75rem;">Assigned</span>
                         <strong style="font-size: 0.875rem;">' . $mAssigned . '</strong>
-                    </div>
-                    <div style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                    </a>
+                    <a href="' . $url . '?status=Pending" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                         <span style="font-weight: 500; font-size: 0.75rem;">Pending</span>
                         <strong style="font-size: 0.875rem;">' . $mPending . '</strong>
-                    </div>
-                    <div style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                    </a>
+                    <a href="' . $url . '?status=Complaint" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                         <span style="font-weight: 500; font-size: 0.75rem;">Complaint</span>
                         <strong style="font-size: 0.875rem;">' . $mComplaint . '</strong>
-                    </div>
-                    <div style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px;">
+                    </a>
+                    <a href="' . $url . '?status=Resolved" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                         <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
                         <strong style="font-size: 0.875rem;">' . $mResolved . '</strong>
-                    </div>
+                    </a>
                 </div>
             ');
 

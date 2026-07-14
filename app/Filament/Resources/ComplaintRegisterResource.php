@@ -590,11 +590,16 @@ class ComplaintRegisterResource extends Resource
                         if ($record->status === 'Complaint' && $record->vendor_complaint_id) {
                             $displayStatus = "Complaint (No.{$record->vendor_complaint_id})";
                         }
-                        $message .= "\n*Status:* {$displayStatus}";
                         
-                        if ($record->technician) {
-                            $message .= "\n*Handled By:* {$record->technician->name}";
-                        }
+                        $statusEmoji = '';
+                        if ($record->status === 'Resolved') $statusEmoji = "\u{2705}";
+                        elseif ($record->status === 'Pending') $statusEmoji = "\u{23F3}";
+                        elseif ($record->status === 'Complaint') $statusEmoji = "\u{26A0}"; // Removed \u{FE0F}
+                        elseif ($record->status === 'Assigned') $statusEmoji = "\u{1F7E1}";
+                        elseif ($record->status === 'Open') $statusEmoji = "\u{1F534}";
+                        
+                        $displayStatus .= ' ' . $statusEmoji;
+                        $message .= "\n\n*Status:* " . trim($displayStatus);
                         
                         return 'https://wa.me/?text=' . urlencode($message);
                     })
