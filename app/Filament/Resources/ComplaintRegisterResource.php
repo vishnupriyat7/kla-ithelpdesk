@@ -651,8 +651,8 @@ class ComplaintRegisterResource extends Resource
 
         $role = auth()->user()->getRoleName();
 
-        // Admin, Superadmin, Hardwareadmin, and chm can see all tickets. Others (like programmer) only see their assigned tickets.
-        if (!in_array($role, ['admin', 'superadmin', 'hardwareadmin', 'chm'])) {
+        // Admin, Superadmin, Hardwareadmin, chm, and cowd can see all tickets. Others (like programmer) only see their assigned tickets.
+        if (!in_array($role, ['admin', 'superadmin', 'hardwareadmin', 'chm', 'cowd'])) {
             $query->where('technician_id', auth()->id());
         }
 

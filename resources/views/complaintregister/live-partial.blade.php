@@ -410,7 +410,7 @@
     let selectedTicketId = null;
     const currentUserId = {{ auth() -> id() ?? 'null' }};
     const currentUserName = @json(auth()->user()->name ?? 'IT HelpDesk Ticket');
-    const canTakeTicket = {{ auth() -> check() && in_array(auth() -> user() -> getRoleName(), ['programmer', 'admin', 'superadmin', 'hardwareadmin']) ? 'true' : 'false' }};
+    const canTakeTicket = {{ auth() -> check() && in_array(auth() -> user() -> getRoleName(), ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin']) ? 'true' : 'false' }};
 
     let employeeMap = {};
 

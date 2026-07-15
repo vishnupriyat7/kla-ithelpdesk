@@ -89,7 +89,7 @@ class ComplaintRegisterController extends Controller
         }
 
         $role = auth()->user()->getRoleName();
-        if (!in_array($role, ['programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
+        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
             return response()->json(['success' => false, 'message' => 'Unauthorized. Only Programmer, HardwareAdmin, and Admin technicians can process tickets.']);
         }
 
@@ -108,7 +108,7 @@ class ComplaintRegisterController extends Controller
         }
 
         $role = auth()->user()->getRoleName();
-        if (!in_array($role, ['programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
+        if (!in_array($role, ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin'])) {
             return response()->json(['success' => false, 'message' => 'Unauthorized. Only Programmer, HardwareAdmin, and Admin technicians can process tickets.']);
         }
 
