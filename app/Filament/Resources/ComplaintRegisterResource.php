@@ -616,7 +616,7 @@ class ComplaintRegisterResource extends Resource
     public static function canCreate(): bool
     {
         $role = auth()->user()->getRoleName();
-        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin']);
+        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin', 'chm']);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
@@ -651,8 +651,8 @@ class ComplaintRegisterResource extends Resource
 
         $role = auth()->user()->getRoleName();
 
-        // Admin, Superadmin, and Hardwareadmin can see all tickets. Others (like chm, programmer) only see their assigned tickets.
-        if (!in_array($role, ['admin', 'superadmin', 'hardwareadmin'])) {
+        // Admin, Superadmin, Hardwareadmin, and chm can see all tickets. Others (like programmer) only see their assigned tickets.
+        if (!in_array($role, ['admin', 'superadmin', 'hardwareadmin', 'chm'])) {
             $query->where('technician_id', auth()->id());
         }
 

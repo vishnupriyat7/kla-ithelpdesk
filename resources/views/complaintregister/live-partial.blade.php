@@ -410,7 +410,7 @@
     let selectedTicketId = null;
     const currentUserId = {{ auth() -> id() ?? 'null' }};
     const currentUserName = @json(auth()->user()->name ?? 'IT HelpDesk Ticket');
-    const canTakeTicket = {{ auth() -> check() && in_array(auth() -> user() -> getRoleName(), ['chm', 'programmer', 'admin', 'superadmin', 'hardwareadmin']) ? 'true' : 'false' }};
+    const canTakeTicket = {{ auth() -> check() && in_array(auth() -> user() -> getRoleName(), ['programmer', 'admin', 'superadmin', 'hardwareadmin']) ? 'true' : 'false' }};
 
     let employeeMap = {};
 
@@ -432,7 +432,15 @@
             .then(data => {
                 allTickets = data;
                 updateCounts();
-                setTab(currentTab);
+                
+                // Update active tab UI without clearing selection
+                document.querySelectorAll('.chat-tab').forEach(el => {
+                    el.classList.remove('active');
+                    if (el.getAttribute('data-tab') === currentTab) {
+                        el.classList.add('active');
+                    }
+                });
+                renderTickets();
 
                 // If a ticket is currently selected, re-render its details
                 if (selectedTicketId) {
