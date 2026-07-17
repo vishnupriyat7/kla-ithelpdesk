@@ -23,6 +23,11 @@ class VendorComplaintResource extends Resource
     protected static ?string $pluralModelLabel = 'Vendor Complaint Register';
     protected static ?int $navigationSort = 2;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->check() && auth()->user()->getRoleName() !== 'cowd';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -52,7 +57,7 @@ class VendorComplaintResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'Un attended' => 'Un attended',
+                                'Unattended' => 'Unattended',
                                 'Pending Spare' => 'Pending Spare',
                                 'Resolved' => 'Resolved',
                             ])

@@ -125,12 +125,9 @@
                                 <label class="form-label">Complaint Type <span class="text-danger">*</span></label>
                                 <select class="form-select" name="complaint_type">
                                     <option value="">Select Type</option>
-                                    <option>Computer</option>
-                                    <option>Software</option>
-                                    <option>Network</option>
-                                    <option>Printer</option>
-                                    <option>Email</option>
-                                    <option>E-Office</option>
+                                    @foreach (\App\Models\ComplaintType::orderBy('name')->get() as $type)
+                                        <option value="{{ $type->name }}">{{ $type->name }}</option>
+                                    @endforeach
                                 </select>
                                 <div class="invalid-feedback d-none" id="err-complaint">Please select a complaint type.
                                 </div>

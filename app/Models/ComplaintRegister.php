@@ -22,11 +22,17 @@ class ComplaintRegister extends Model
         'technician_id',
         'remarks',
         'vendor_complaint_id',
+        'user_id',
     ];
 
     public function technician()
     {
         return $this->belongsTo(User::class, 'technician_id');
+    }
+
+    public function raisedBy()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function location()

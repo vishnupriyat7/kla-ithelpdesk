@@ -198,14 +198,7 @@ class ComplaintRegisterResource extends Resource
                                 }
                             }),
                         Forms\Components\Select::make('complaint_type')
-                            ->options([
-                                'Computer' => 'Computer',
-                                'Software' => 'Software',
-                                'Network' => 'Network',
-                                'Printer' => 'Printer',
-                                'Email' => 'Email',
-                                'E-Office' => 'E-Office',
-                            ])
+                            ->options(fn () => \App\Models\ComplaintType::pluck('name', 'name')->toArray())
                             ->required(),
                     ])->columns(2),
                 Forms\Components\Section::make('Location Details')
@@ -267,6 +260,8 @@ class ComplaintRegisterResource extends Resource
                             ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin'])),
                         Forms\Components\Textarea::make('remarks')
                             ->columnSpanFull(),
+                        Forms\Components\Hidden::make('user_id')
+                            ->default(fn () => auth()->id()),
                     ])->columns(2),
             ]);
     }
@@ -381,7 +376,8 @@ class ComplaintRegisterResource extends Resource
                 Tables\Columns\TextColumn::make('ticket_no')
                     ->label('Ticket #')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->icon(fn (string $state): ?string => $state === 'Complaint' ? 'heroicon-m-exclamation-triangle' : null)
@@ -404,7 +400,8 @@ class ComplaintRegisterResource extends Resource
                         'Closed' => 'gray',
                         default => 'secondary',
                     })
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('vendor_complaint_id')
                     ->label('Complaint ID')
                     ->badge()
@@ -421,32 +418,46 @@ class ComplaintRegisterResource extends Resource
                         return \App\Filament\Resources\VendorComplaintResource::getUrl('index');
                     })
                     ->openUrlInNewTab()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('employee_id')
                     ->label('Requested By')
                     ->formatStateUsing(fn($state) => static::resolveEmployeeName($state))
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('section')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('location.location')
                     ->label('Building')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('room.name')
                     ->label('Room')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('complaint_type')
                     ->label('Type')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('technician.name')
                     ->label('Technician')
                     ->placeholder('Unassigned')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('raisedBy.name')
+                    ->label('Raised By')
+                    ->placeholder('System / Unknown')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Raised At')
                     ->dateTime('d-M-Y h:i A')
                     ->timezone('Asia/Kolkata')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -458,14 +469,7 @@ class ComplaintRegisterResource extends Resource
                         'Resolved' => 'Resolved',
                     ]),
                 Tables\Filters\SelectFilter::make('complaint_type')
-                    ->options([
-                        'Computer' => 'Computer',
-                        'Software' => 'Software',
-                        'Network' => 'Network',
-                        'Printer' => 'Printer',
-                        'Email' => 'Email',
-                        'E-Office' => 'E-Office',
-                    ]),
+                    ->options(fn () => \App\Models\ComplaintType::pluck('name', 'name')->toArray()),
                 Tables\Filters\Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from'),
@@ -519,11 +523,11 @@ class ComplaintRegisterResource extends Resource
                             ->required(),
                         \Filament\Forms\Components\Select::make('status')
                             ->options([
-                                'Un attended' => 'Un attended',
+                                'Unattended' => 'Unattended',
                                 'Pending Spare' => 'Pending Spare',
                                 'Resolved' => 'Resolved',
                             ])
-                            ->default('Un attended')
+                            ->default('Unattended')
                             ->required(),
                         \Filament\Forms\Components\Textarea::make('chm_remark')
                             ->label('Remarks')
@@ -616,7 +620,7 @@ class ComplaintRegisterResource extends Resource
     public static function canCreate(): bool
     {
         $role = auth()->user()->getRoleName();
-        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin', 'chm']);
+        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin', 'chm', 'cowd']);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool

@@ -64,6 +64,7 @@ class ComplaintRegisterController extends Controller
             'room_id' => $request->room_id,
             'complaint_type' => $request->complaint_type,
             'description' => $request->description,
+            'user_id' => auth()->id(),
         ]);
 
         return back()->with([
@@ -139,7 +140,7 @@ class ComplaintRegisterController extends Controller
                 [
                     'vendor' => $request->input('vendor_name'),
                     'vendor_complaint_no' => $vendor_complaint_id,
-                    'status' => $request->input('vendor_status', 'Pending Spare'),
+                    'status' => $request->input('vendor_status', 'Unattended'),
                     'complaint_description' => $request->input('vendor_description'),
                     'chm_remark' => $request->input('remarks'),
                     'user_id' => auth()->id(),

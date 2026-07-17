@@ -112,6 +112,11 @@ class AdminPanelProvider extends PanelProvider
                 'white' => '#FFFFFF',
             ])
             ->brandName('IT HelpDesk')
+            ->navigationGroups([
+                'Complaint Register',
+                'User Management',
+                'Settings',
+            ])
             ->favicon(asset('images/favicon.png'))
             ->font('Poppins')
 

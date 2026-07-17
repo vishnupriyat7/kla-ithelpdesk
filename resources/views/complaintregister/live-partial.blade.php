@@ -1047,6 +1047,7 @@
                     <div class="mb-2">
                         <label class="form-label" style="font-size: 12px;">Vendor Status</label>
                         <select class="form-select form-select-sm" id="modalVendorStatus">
+                            <option value="Unattended">Unattended</option>
                             <option value="Pending Spare">Pending Spare</option>
                             <option value="Closed">Closed</option>
                         </select>
