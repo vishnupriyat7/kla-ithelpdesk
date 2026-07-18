@@ -78,7 +78,19 @@ class ComplaintRegisterController extends Controller
     }
     public function liveData()
     {
-        $tickets = ComplaintRegister::with(['technician', 'location', 'room', 'statusHistories.technician'])->latest()->get();
+        $query = ComplaintRegister::with(['technician', 'location', 'room', 'statusHistories.technician'])->latest();
+
+        if (auth()->check()) {
+            $role = auth()->user()->getRoleName();
+            if (in_array($role, ['chm', 'programmer'])) {
+                $query->where(function ($q) {
+                    $q->where('status', 'Open')
+                      ->orWhere('technician_id', auth()->id());
+                });
+            }
+        }
+
+        $tickets = $query->get();
 
         return response()->json($tickets);
     }
