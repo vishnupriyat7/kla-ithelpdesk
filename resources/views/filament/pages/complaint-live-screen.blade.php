@@ -21,6 +21,9 @@
     </style>
     <!-- Use iframe to embed Bootstrap view without conflicting with Filament's Tailwind CSS -->
     <div id="live-screen-wrapper" class="bg-transparent overflow-hidden" style="height: calc(100vh - 65px);">
-        <iframe src="{{ url('/complaintregister/live-iframe') }}{{ request()->has('status') ? '?status=' . request()->query('status') : '' }}" class="w-full h-full border-0"></iframe>
+        @php
+            $queryString = request()->getQueryString();
+        @endphp
+        <iframe src="{{ url('/complaintregister/live-iframe') }}{{ $queryString ? '?' . $queryString : '' }}" class="w-full h-full border-0"></iframe>
     </div>
 </x-filament-panels::page>

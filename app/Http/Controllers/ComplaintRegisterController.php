@@ -76,11 +76,11 @@ class ComplaintRegisterController extends Controller
     {
         return view('complaintregister.live');
     }
-    public function liveData()
+    public function liveData(Request $request)
     {
         $query = ComplaintRegister::with(['technician', 'location', 'room', 'statusHistories.technician'])->latest();
 
-        if (auth()->check()) {
+        if (auth()->check() && $request->query('scope') !== 'all') {
             $role = auth()->user()->getRoleName();
             if (in_array($role, ['chm', 'programmer'])) {
                 $query->where(function ($q) {

@@ -381,7 +381,7 @@
                             class="mb-0">
                     </div>
                     <div class="col-6">
-                        <input type="text" id="filterSection" placeholder="Filter Section..." oninput="renderTickets()"
+                        <input type="text" id="filterSection" placeholder="Section, Tech, Bldg..." oninput="renderTickets()"
                             class="mb-0">
                     </div>
                 </div>
@@ -427,7 +427,7 @@
     }
 
     function loadTickets() {
-        fetch('/complaintregister/live-data')
+        fetch('/complaintregister/live-data?scope={{ request()->query('scope', '') }}')
             .then(res => res.json())
             .then(data => {
                 allTickets = data;
@@ -554,7 +554,12 @@
             let searchMatch = String(t.ticket_no || '').toLowerCase().includes(search) ||
                 String(t.employee_id || '').toLowerCase().includes(search);
 
-            let sectionMatch = String(t.section || '').toLowerCase().includes(section);
+            let techName = t.technician ? t.technician.name : '';
+            let locationName = t.location ? t.location.location : (t.office_location_id || '');
+            
+            let sectionMatch = String(t.section || '').toLowerCase().includes(section) ||
+                               String(techName).toLowerCase().includes(section) ||
+                               String(locationName).toLowerCase().includes(section);
 
             return statusMatch && searchMatch && sectionMatch;
         });

@@ -28,23 +28,23 @@ class ComplaintRegisterStatsOverview extends BaseWidget
         $url = url('/admin/complaint-live-screen');
         $globalBadges = new \Illuminate\Support\HtmlString('
             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; width: 100%;">
-                <a href="' . $url . '?status=Open" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                <a href="' . $url . '?status=Open&scope=all" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Open</span>
                     <strong style="font-size: 0.875rem;">' . $gOpen . '</strong>
                 </a>
-                <a href="' . $url . '?status=Assigned" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                <a href="' . $url . '?status=Assigned&scope=all" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Assigned</span>
                     <strong style="font-size: 0.875rem;">' . $gAssigned . '</strong>
                 </a>
-                <a href="' . $url . '?status=Pending" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                <a href="' . $url . '?status=Pending&scope=all" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Pending</span>
                     <strong style="font-size: 0.875rem;">' . $gPending . '</strong>
                 </a>
-                <a href="' . $url . '?status=Complaint" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                <a href="' . $url . '?status=Complaint&scope=all" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Complaint</span>
                     <strong style="font-size: 0.875rem;">' . $gComplaint . '</strong>
                 </a>
-                <a href="' . $url . '?status=Resolved" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                <a href="' . $url . '?status=Resolved&scope=all" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
                     <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
                     <strong style="font-size: 0.875rem;">' . $gResolvedTotal . '</strong>
                 </a>
