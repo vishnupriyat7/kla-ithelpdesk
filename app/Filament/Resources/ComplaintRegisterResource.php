@@ -621,7 +621,7 @@ class ComplaintRegisterResource extends Resource
     public static function canCreate(): bool
     {
         $role = auth()->user()->getRoleName();
-        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin', 'cowd']);
+        return auth()->check() && in_array($role, ['admin', 'hardwareadmin', 'superadmin', 'chm', 'cowd']);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
