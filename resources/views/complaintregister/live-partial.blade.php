@@ -376,13 +376,9 @@
 
             <div class="chat-search">
                 <div class="row g-2">
-                    <div class="col-6">
-                        <input type="text" id="filterSearch" placeholder="Search ticket no..." oninput="renderTickets()"
-                            class="mb-0">
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="filterSection" placeholder="Section, Tech, Bldg..." oninput="renderTickets()"
-                            class="mb-0">
+                    <div class="col-12">
+                        <input type="text" id="filterSearch" placeholder="Search Ticket No/Section/Technician Name/Building / Location" oninput="renderTickets()"
+                            class="mb-0 w-100">
                     </div>
                 </div>
             </div>
@@ -539,7 +535,6 @@
 
     function renderTickets() {
         const search = document.getElementById('filterSearch').value.toLowerCase();
-        const section = document.getElementById('filterSection').value.toLowerCase();
 
         let filtered = allTickets.filter(t => {
             // Check status array (Done tab can include Resolved and Closed or others)
@@ -551,17 +546,15 @@
             if (currentTab === 'Resolved') statusMatch = ['Resolved', 'Closed'].includes(t.status);
             if (currentTab === 'All') statusMatch = true;
 
-            let searchMatch = String(t.ticket_no || '').toLowerCase().includes(search) ||
-                String(t.employee_id || '').toLowerCase().includes(search);
-
             let techName = t.technician ? t.technician.name : '';
             let locationName = t.location ? t.location.location : (t.office_location_id || '');
-            
-            let sectionMatch = String(t.section || '').toLowerCase().includes(section) ||
-                               String(techName).toLowerCase().includes(section) ||
-                               String(locationName).toLowerCase().includes(section);
 
-            return statusMatch && searchMatch && sectionMatch;
+            let searchMatch = String(t.ticket_no || '').toLowerCase().includes(search) ||
+                String(t.section || '').toLowerCase().includes(search) ||
+                String(techName).toLowerCase().includes(search) ||
+                String(locationName).toLowerCase().includes(search);
+
+            return statusMatch && searchMatch;
         });
 
         let html = '';
