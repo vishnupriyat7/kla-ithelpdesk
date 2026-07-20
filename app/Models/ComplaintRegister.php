@@ -56,15 +56,37 @@ class ComplaintRegister extends Model
 
         static::creating(function ($ticket) {
             if (empty($ticket->ticket_no)) {
-                DB::transaction(function () use ($ticket) {
-                    $year = now()->format('Y');
-                    $count = static::whereYear('created_at', now()->year)
-                        ->lockForUpdate()
-                        ->count() + 1;
-                    
-                    // Format: IT-YYYY0001
-                    $ticket->ticket_no = 'IT-' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
-                });
+                $year = now()->format('Y');
+                $cacheKey = 'ticket_seq_' . $year;
+                
+                // Atomically increment the sequence. If it doesn't exist, we must initialize it.
+                if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                    $lock = \Illuminate\Support\Facades\Cache::lock('init_ticket_seq_' . $year, 10);
+                    try {
+                        $lock->block(5);
+                        if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                            $latestTicket = static::whereYear('created_at', now()->year)
+                                ->latest('id')
+                                ->first();
+                            
+                            $startCount = 0;
+                            if ($latestTicket && preg_match('/IT-\d{4}(\d+)/', $latestTicket->ticket_no, $matches)) {
+                                $startCount = intval($matches[1]);
+                            } else {
+                                $startCount = static::whereYear('created_at', now()->year)->count();
+                            }
+                            
+                            // Initialize cache with the current max
+                            \Illuminate\Support\Facades\Cache::forever($cacheKey, $startCount);
+                        }
+                    } finally {
+                        $lock?->release();
+                    }
+                }
+
+                // Atomic increment prevents any duplicate generation across concurrent requests
+                $count = \Illuminate\Support\Facades\Cache::increment($cacheKey);
+                $ticket->ticket_no = 'IT-' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
             }
         });
 

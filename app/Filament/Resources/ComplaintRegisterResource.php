@@ -611,7 +611,8 @@ class ComplaintRegisterResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->hidden(fn () => auth()->user()?->getRoleName() === 'chm'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
