@@ -28,6 +28,10 @@ class AdminPanelProvider extends PanelProvider
                 fn (): string => \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa')
             )
             ->renderHook(
+                \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => auth()->check() ? '<div class="text-sm font-semibold dark:text-gray-300" style="margin-right: 12px; margin-left: 12px; display: flex; align-items: center;">' . auth()->user()->name . '</div>' : ''
+            )
+            ->renderHook(
                 \Filament\View\PanelsRenderHook::STYLES_AFTER,
                 fn (): string => '
                 <style>
