@@ -921,14 +921,15 @@
                             waMessage += `*Remarks:* _${remarks}_\n`;
                         }
                         
+                        let displayStatus = status === 'Unassign' ? 'Open' : status;
                         let statusEmoji = '';
-                        if (status === 'Resolved') statusEmoji = '\u{2705}';
-                        else if (status === 'Pending') statusEmoji = '\u{23F3}';
-                        else if (status === 'Complaint') statusEmoji = '\u{26A0}';
-                        else if (status === 'Assigned') statusEmoji = '\u{1F7E1}';
-                        else if (status === 'Open') statusEmoji = '\u{1F534}';
+                        if (displayStatus === 'Resolved') statusEmoji = '\u{2705}';
+                        else if (displayStatus === 'Pending') statusEmoji = '\u{23F3}';
+                        else if (displayStatus === 'Complaint') statusEmoji = '\u{26A0}';
+                        else if (displayStatus === 'Assigned') statusEmoji = '\u{1F7E1}';
+                        else if (displayStatus === 'Open') statusEmoji = '\u{1F534}';
                         
-                        let finalStatusStr = `${status} ${statusEmoji}`.trim();
+                        let finalStatusStr = `${displayStatus} ${statusEmoji}`.trim();
                         waMessage += `\n\n*Status:*      ${finalStatusStr}`;
                         
                         document.getElementById('btnUpdateWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
@@ -1018,6 +1019,7 @@
                         <option value="Pending">Pending</option>
                         <option value="Complaint">Complaint</option>
                         <option value="Resolved">Resolved</option>
+                        <option value="Unassign">Unassign</option>
                     </select>
                 </div>
                 <div class="mb-3" id="complaintLinkDiv" style="display: none; background: #fff5f5; padding: 10px; border-radius: 6px; border: 1px solid #ffcccc;">

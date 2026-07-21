@@ -131,6 +131,20 @@ class ComplaintRegisterController extends Controller
 
         $status = $request->input('status', 'Resolved');
 
+        if ($status === 'Unassign') {
+            $ticket->update([
+                'status' => 'Open',
+                'technician_id' => null,
+                'remarks' => $request->input('remarks'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ticket Unassigned successfully',
+                'updated_by' => auth()->user()->name
+            ]);
+        }
+
         $vendor_complaint_id = $request->input('vendor_complaint_id');
 
         if ($status === 'Complaint' && $vendor_complaint_id) {

@@ -25,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa')
+                fn (): string => str_replace('console.error("Service workers are not supported.");', '', \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa'))
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,

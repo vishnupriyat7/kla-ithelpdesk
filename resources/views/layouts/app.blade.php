@@ -21,7 +21,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @pwaHead
-    @laravelPwa
+    {!! str_replace('console.error("Service workers are not supported.");', '', \Illuminate\Support\Facades\Blade::render('@laravelPwa')) !!}
 </head>
 
 <body class="font-sans antialiased">

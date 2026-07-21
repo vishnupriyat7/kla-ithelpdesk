@@ -14,7 +14,7 @@
         .whatsapp-container { height: 100vh !important; margin: 0 !important; border: none !important; border-radius: 0 !important; }
     </style>
     @pwaHead
-    @laravelPwa
+    {!! str_replace('console.error("Service workers are not supported.");', '', \Illuminate\Support\Facades\Blade::render('@laravelPwa')) !!}
 </head>
 <body>
     @include('complaintregister.live-partial')

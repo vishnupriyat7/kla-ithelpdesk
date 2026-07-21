@@ -107,9 +107,9 @@ class ComplaintRegisterStatsOverview extends BaseWidget
                 </div>
             ');
 
-            $stats[] = Stat::make('My Tickets', $mTotal)
+            array_unshift($stats, Stat::make('My Tickets', $mTotal)
                 ->description($myBadges)
-                ->color('info');
+                ->color('info'));
         }
 
         return $stats;
