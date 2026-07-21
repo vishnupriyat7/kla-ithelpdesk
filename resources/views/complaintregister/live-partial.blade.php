@@ -607,7 +607,17 @@
             }
         });
 
-        document.getElementById('ticketList').innerHTML = html;
+        let listScrollTop = 0;
+        const ticketList = document.getElementById('ticketList');
+        if (ticketList) {
+            listScrollTop = ticketList.scrollTop;
+        }
+
+        ticketList.innerHTML = html;
+
+        if (ticketList) {
+            ticketList.scrollTop = listScrollTop;
+        }
     }
 
     function selectTicket(id) {
@@ -769,7 +779,7 @@
                         <small class="text-muted">${formatTicketDate(h.created_at)}</small>
                     </div>
                     <p class="mb-0 mt-1">Technician: <b>${h.technician ? h.technician.name : 'Unassigned'}</b></p>
-                    ${h.remarks ? `<p class="mb-0 mt-1"><b>Remarks:</b> <br/> ${h.remarks}</p>` : ''}
+                    ${h.remarks ? `<p class="mb-0 mt-1"><b>Remarks:</b> ${h.remarks}</p>` : ''}
                 </div>
                 `).join('')}
             </div>
@@ -794,7 +804,18 @@
                 `;
         }
 
+        let bodyScrollTop = 0;
+        const currentBody = document.querySelector('.chat-main-body');
+        if (currentBody) {
+            bodyScrollTop = currentBody.scrollTop;
+        }
+
         document.getElementById('ticketDetailPane').innerHTML = headerHtml + bodyHtml + footerHtml;
+
+        const newBody = document.querySelector('.chat-main-body');
+        if (newBody) {
+            newBody.scrollTop = bodyScrollTop;
+        }
     }
 
     function takeTicket(id) {
@@ -856,6 +877,8 @@
         document.getElementById('modalStatus').value = ['Resolved', 'Pending', 'Complaint', 'Assigned'].includes(t.status) ? t.status : 'Assigned';
         document.getElementById('modalRemarks').value = t.remarks || '';
         document.getElementById('modalVendorComplaintId').value = t.vendor_complaint_id || '';
+        document.getElementById('modalResolvedStatus').value = '';
+        document.getElementById('modalHelpedBy').value = '';
 
         toggleComplaintLink();
 
@@ -866,21 +889,42 @@
     function toggleComplaintLink() {
         const status = document.getElementById('modalStatus').value;
         const linkDiv = document.getElementById('complaintLinkDiv');
+        const resolvedDiv = document.getElementById('resolvedOptionsDiv');
+        
         if (status === 'Complaint') {
             linkDiv.style.display = 'block';
         } else {
             linkDiv.style.display = 'none';
+        }
+
+        if (status === 'Resolved') {
+            resolvedDiv.style.display = 'block';
+        } else {
+            resolvedDiv.style.display = 'none';
         }
     }
 
     function submitStatusUpdate() {
         const id = document.getElementById('modalTicketId').value;
         const status = document.getElementById('modalStatus').value;
-        const remarks = document.getElementById('modalRemarks').value;
+        let remarks = document.getElementById('modalRemarks').value;
         const vendor_complaint_id = document.getElementById('modalVendorComplaintId').value;
         const vendor_name = document.getElementById('modalVendorName').value;
         const vendor_status = document.getElementById('modalVendorStatus').value;
         const vendor_description = document.getElementById('modalVendorDescription').value;
+
+        if (status === 'Resolved') {
+            const resolvedStatus = document.getElementById('modalResolvedStatus').value;
+            const helpedBy = document.getElementById('modalHelpedBy').value;
+
+            let extraRemarks = [];
+            if (resolvedStatus) extraRemarks.push(resolvedStatus);
+            if (helpedBy) extraRemarks.push("Helped By: " + helpedBy);
+
+            if (extraRemarks.length > 0) {
+                remarks = (remarks ? remarks + "\n" : "") + extraRemarks.join(" | ");
+            }
+        }
 
         if (status === 'Pending' && remarks.trim() === '') {
             alert('Please enter Remarks to explain why this ticket is Pending.');
@@ -1021,6 +1065,28 @@
                         <option value="Resolved">Resolved</option>
                         <option value="Unassign">Unassign</option>
                     </select>
+                </div>
+                <div class="mb-3" id="resolvedOptionsDiv" style="display: none; background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size: 12px;">Resolved Status (Optional)</label>
+                        <select class="form-select form-select-sm" id="modalResolvedStatus">
+                            <option value="">-- Select --</option>
+                            <option value="Site Up/Vendor Pending">Site Up/Vendor Pending</option>
+                            <option value="Standby Given/Vendor Pending">Standby Given/Vendor Pending</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size: 12px;">Helped By (Optional)</label>
+                        <select class="form-select form-select-sm" id="modalHelpedBy">
+                            <option value="">-- Select CHM --</option>
+                            @php
+                                $chmUsers = \App\Models\User::with('role')->get()->filter(fn($u) => $u->getRoleName() === 'chm');
+                            @endphp
+                            @foreach($chmUsers as $chmUser)
+                                <option value="{{ $chmUser->name }}">{{ $chmUser->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="mb-3" id="complaintLinkDiv" style="display: none; background: #fff5f5; padding: 10px; border-radius: 6px; border: 1px solid #ffcccc;">
                     <label class="form-label text-danger fw-bold"><i class="bi bi-exclamation-triangle"></i> Register Vendor Complaint</label>
