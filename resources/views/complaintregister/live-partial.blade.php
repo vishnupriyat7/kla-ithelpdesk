@@ -683,6 +683,51 @@
             if (t.description && t.description !== '-') {
                 waMessage += `\n*Problem:* ${t.description}`;
             }
+
+            if (t.vendor_complaint_id) {
+                waMessage += `\n*Complaint:* ID - ${t.vendor_complaint_id}`;
+            }
+
+            let waRemarks = t.remarks || '';
+            let waHelpedByName = '';
+            let waResolvedStatus = '';
+
+            if (t.status === 'Resolved' && waRemarks) {
+                let helpedByRegex = /(?:\|\s*)?Helped By:\s*([^\n|]+)/;
+                let match = waRemarks.match(helpedByRegex);
+                if (match) {
+                    waHelpedByName = match[1].trim();
+                    waRemarks = waRemarks.replace(match[0], '').trim();
+                }
+                
+                let resolvedStatusRegex = /(Site Up\/Vendor Pending|Standby Given\/Vendor Pending)/;
+                let statusMatch = waRemarks.match(resolvedStatusRegex);
+                if (statusMatch) {
+                    waResolvedStatus = statusMatch[1];
+                    waRemarks = waRemarks.replace(statusMatch[0], '').trim();
+                }
+                
+                if (waRemarks.endsWith('|')) waRemarks = waRemarks.slice(0, -1).trim();
+                if (waRemarks.startsWith('|')) waRemarks = waRemarks.slice(1).trim();
+            }
+
+            if (t.status === 'Resolved' && t.technician) {
+                let techNameStr = t.technician.name;
+                if (waHelpedByName) techNameStr += ` & ${waHelpedByName}`;
+                waMessage += `\n*Resolved by:* ${techNameStr}`;
+            }
+            
+            if (waRemarks && t.status === 'Resolved') {
+                waMessage += `\n\n*Remarks:* ${waRemarks}`;
+            } else if (waRemarks && t.status !== 'Resolved') {
+                waMessage += `\n\n*Remarks:* ${waRemarks}`;
+            }
+
+            let finalStatusStrDisplay = displayStatus;
+            if (t.status === 'Resolved' && waResolvedStatus) {
+                finalStatusStrDisplay += ` , ${waResolvedStatus}`;
+            }
+
             let statusEmoji = '';
             if (t.status === 'Resolved') statusEmoji = '\u{2705}';
             else if (t.status === 'Pending') statusEmoji = '\u{23F3}';
@@ -690,7 +735,7 @@
             else if (t.status === 'Assigned') statusEmoji = '\u{1F7E1}';
             else if (t.status === 'Open') statusEmoji = '\u{1F534}';
             
-            let finalStatusStr = `${displayStatus} ${statusEmoji}`.trim();
+            let finalStatusStr = `${finalStatusStrDisplay} ${statusEmoji}`.trim();
             waMessage += `\n\n*Status:* ${finalStatusStr}`;
 
             let waUrl = 'https://wa.me/?text=' + encodeURIComponent(waMessage);
@@ -772,16 +817,52 @@
                     </div>
                 </div>
 
-                ${(t.status_histories || []).map(h => `
+                ${(t.status_histories || []).map(h => {
+                    let statusDisplay = h.status;
+                    if (h.status === 'Complaint' && t.vendor_complaint_id) {
+                        statusDisplay += ` (id- ${t.vendor_complaint_id})`;
+                    }
+                    
+                    let displayRemarks = h.remarks || '';
+                    let helpedByName = '';
+                    let techLabel = h.status === 'Resolved' ? 'Resolved by :' : 'Technician:';
+                    let techName = h.technician ? h.technician.name : 'Unassigned';
+
+                    if (h.status === 'Resolved' && displayRemarks) {
+                        let helpedByRegex = /(?:\|\s*)?Helped By:\s*([^\n|]+)/;
+                        let match = displayRemarks.match(helpedByRegex);
+                        if (match) {
+                            helpedByName = match[1].trim();
+                            techName += ` & ${helpedByName}`;
+                            displayRemarks = displayRemarks.replace(match[0], '').trim();
+                        }
+                        
+                        let resolvedStatusRegex = /(Site Up\/Vendor Pending|Standby Given\/Vendor Pending)/;
+                        let statusMatch = displayRemarks.match(resolvedStatusRegex);
+                        if (statusMatch) {
+                            statusDisplay += ` , ${statusMatch[1]}`;
+                            displayRemarks = displayRemarks.replace(statusMatch[0], '').trim();
+                        }
+
+                        if (displayRemarks.endsWith('|')) {
+                            displayRemarks = displayRemarks.slice(0, -1).trim();
+                        }
+                        if (displayRemarks.startsWith('|')) {
+                            displayRemarks = displayRemarks.slice(1).trim();
+                        }
+                    }
+
+                    return `
                 <div class="message-bubble mt-3 w-100" style="background-color: #d1f4cc; border: 1px solid #c1e4bc;">
                     <div class="d-flex justify-content-between">
-                        <strong>Status Update: ${h.status}</strong>
+                        <strong>Status Update: ${statusDisplay}</strong>
                         <small class="text-muted">${formatTicketDate(h.created_at)}</small>
                     </div>
-                    <p class="mb-0 mt-1">Technician: <b>${h.technician ? h.technician.name : 'Unassigned'}</b></p>
-                    ${h.remarks ? `<p class="mb-0 mt-1"><b>Remarks:</b> ${h.remarks}</p>` : ''}
+                    <p class="mb-0 mt-1">${techLabel} <b>${techName}</b></p>
+                    ${displayRemarks ? `<p class="mb-0 mt-1"><b>Remarks:</b> ${displayRemarks}</p>` : ''}
                 </div>
-                `).join('')}
+                `;
+                }).join('')}
             </div>
         `;
 
@@ -955,26 +1036,65 @@
                     
                     const t = allTickets.find(ticket => ticket.id == id);
                     if (t) {
-                        let waMessage = `*${data.updated_by}*\n`;
-                        waMessage += `*Ticket No:*   [${t.ticket_no}]\n`;
+                        let waMessage = `*${data.updated_by}*\n\n`;
+                        waMessage += `*Ticket No:* ${t.ticket_no}\n`;
+                        
+                        let locStr = (t.location ? t.location.location : (t.office_location_id || '-')) + ' / ' + (t.room ? t.room.name : (t.room_id || '-'));
+                        waMessage += `*Location:* ${locStr}\n`;
+                        waMessage += `*Type:* ${t.complaint_type || '-'}\n`;
+                        waMessage += `*Problem:* ${t.description || '-'}\n`;
+
                         if (vendor_complaint_id) {
-                            waMessage += `*Vendor:*      ${vendor_name}\n`;
-                            waMessage += `*Vendor ID:*   ${vendor_complaint_id}\n`;
+                            waMessage += `*Complaint:* ${vendor_name} - ${vendor_complaint_id}\n`;
                         }
-                        if (remarks) {
-                            waMessage += `*Remarks:* _${remarks}_\n`;
+
+                        let waRemarks = remarks || '';
+                        let waHelpedByName = '';
+                        let waResolvedStatus = '';
+
+                        if (status === 'Resolved' && waRemarks) {
+                            let helpedByRegex = /(?:\|\s*)?Helped By:\s*([^\n|]+)/;
+                            let match = waRemarks.match(helpedByRegex);
+                            if (match) {
+                                waHelpedByName = match[1].trim();
+                                waRemarks = waRemarks.replace(match[0], '').trim();
+                            }
+                            
+                            let resolvedStatusRegex = /(Site Up\/Vendor Pending|Standby Given\/Vendor Pending)/;
+                            let statusMatch = waRemarks.match(resolvedStatusRegex);
+                            if (statusMatch) {
+                                waResolvedStatus = statusMatch[1];
+                                waRemarks = waRemarks.replace(statusMatch[0], '').trim();
+                            }
+                            
+                            if (waRemarks.endsWith('|')) waRemarks = waRemarks.slice(0, -1).trim();
+                            if (waRemarks.startsWith('|')) waRemarks = waRemarks.slice(1).trim();
+                        }
+
+                        let techNameStr = data.updated_by;
+                        if (status === 'Resolved') {
+                            if (waHelpedByName) techNameStr += ` & ${waHelpedByName}`;
+                            waMessage += `*Resolved by:* ${techNameStr}\n`;
+                        }
+
+                        let displayStatus = status === 'Unassign' ? 'Open' : status;
+                        if (status === 'Resolved' && waResolvedStatus) {
+                            displayStatus += ` , ${waResolvedStatus}`;
                         }
                         
-                        let displayStatus = status === 'Unassign' ? 'Open' : status;
                         let statusEmoji = '';
-                        if (displayStatus === 'Resolved') statusEmoji = '\u{2705}';
-                        else if (displayStatus === 'Pending') statusEmoji = '\u{23F3}';
-                        else if (displayStatus === 'Complaint') statusEmoji = '\u{26A0}';
-                        else if (displayStatus === 'Assigned') statusEmoji = '\u{1F7E1}';
-                        else if (displayStatus === 'Open') statusEmoji = '\u{1F534}';
+                        if (status === 'Resolved') statusEmoji = '\u{2705}';
+                        else if (status === 'Pending') statusEmoji = '\u{23F3}';
+                        else if (status === 'Complaint') statusEmoji = '\u{26A0}';
+                        else if (status === 'Assigned') statusEmoji = '\u{1F7E1}';
+                        else if (status === 'Open' || status === 'Unassign') statusEmoji = '\u{1F534}';
+                        
+                        if (waRemarks) {
+                            waMessage += `\n*Remarks:* ${waRemarks}\n`;
+                        }
                         
                         let finalStatusStr = `${displayStatus} ${statusEmoji}`.trim();
-                        waMessage += `\n\n*Status:*      ${finalStatusStr}`;
+                        waMessage += `\n*Status:* ${finalStatusStr}`;
                         
                         document.getElementById('btnUpdateWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
                         document.getElementById('updateSuccessMessage').innerText = data.message;

@@ -25,15 +25,15 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->renderHook(
                 \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): string => str_replace('console.error("Service workers are not supported.");', '', \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa'))
+                fn(): string => str_replace('console.error("Service workers are not supported.");', '', \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa'))
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
-                fn (): string => auth()->check() ? '<div class="text-sm font-semibold dark:text-gray-300" style="margin-right: 12px; margin-left: 12px; display: flex; align-items: center;">' . auth()->user()->name . '</div>' : ''
+                fn(): string => auth()->check() ? '<div class="text-sm font-semibold dark:text-gray-300" style="margin-right: 12px; margin-left: 12px; display: flex; align-items: center;">' . auth()->user()->name . '</div>' : ''
             )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::STYLES_AFTER,
-                fn (): string => '
+                fn(): string => '
                 <style>
                     /* Premium Dark Sidebar Customization */
                     aside.fi-sidebar {

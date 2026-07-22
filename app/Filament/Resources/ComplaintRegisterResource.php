@@ -590,9 +590,47 @@ class ComplaintRegisterResource extends Resource
                             $message .= "\n*Problem:* {$record->description}";
                         }
                         
+                        if ($record->vendor_complaint_id) {
+                            $vendorName = '';
+                            $vc = \App\Models\VendorComplaint::where('vendor_complaint_no', $record->vendor_complaint_id)->first();
+                            if ($vc && $vc->vendor) $vendorName = $vc->vendor . ' - ';
+                            
+                            $message .= "\n*Complaint:* {$vendorName}{$record->vendor_complaint_id}";
+                        }
+                        
+                        $waRemarks = $record->remarks ?? '';
+                        $waHelpedByName = '';
+                        $waResolvedStatus = '';
+
+                        if ($record->status === 'Resolved' && $waRemarks) {
+                            if (preg_match('/(?:\|\s*)?Helped By:\s*([^\n|]+)/', $waRemarks, $matches)) {
+                                $waHelpedByName = trim($matches[1]);
+                                $waRemarks = trim(str_replace($matches[0], '', $waRemarks));
+                            }
+                            
+                            if (preg_match('/(Site Up\/Vendor Pending|Standby Given\/Vendor Pending)/', $waRemarks, $matches)) {
+                                $waResolvedStatus = trim($matches[1]);
+                                $waRemarks = trim(str_replace($matches[0], '', $waRemarks));
+                            }
+                            
+                            $waRemarks = trim($waRemarks, '| ');
+                        }
+
+                        if ($record->status === 'Resolved') {
+                            $techNameStr = $record->technician ? $record->technician->name : 'Unassigned';
+                            if ($waHelpedByName) {
+                                $techNameStr .= " & {$waHelpedByName}";
+                            }
+                            $message .= "\n*Resolved by:* {$techNameStr}";
+                        }
+                        
+                        if ($waRemarks) {
+                            $message .= "\n\n*Remarks:* {$waRemarks}";
+                        }
+
                         $displayStatus = $record->status;
-                        if ($record->status === 'Complaint' && $record->vendor_complaint_id) {
-                            $displayStatus = "Complaint (No.{$record->vendor_complaint_id})";
+                        if ($record->status === 'Resolved' && $waResolvedStatus) {
+                            $displayStatus .= " , {$waResolvedStatus}";
                         }
                         
                         $statusEmoji = '';
@@ -602,8 +640,7 @@ class ComplaintRegisterResource extends Resource
                         elseif ($record->status === 'Assigned') $statusEmoji = "\u{1F7E1}";
                         elseif ($record->status === 'Open') $statusEmoji = "\u{1F534}";
                         
-                        $displayStatus .= ' ' . $statusEmoji;
-                        $message .= "\n\n*Status:* " . trim($displayStatus);
+                        $message .= "\n\n*Status:* " . trim("{$displayStatus} {$statusEmoji}");
                         
                         return 'https://wa.me/?text=' . urlencode($message);
                     })

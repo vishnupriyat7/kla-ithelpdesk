@@ -40,6 +40,7 @@ class VendorComplaintResource extends Resource
                                 'IHRD' => 'IHRD',
                                 'Lipi' => 'Lipi',
                                 'Aser' => 'Aser',
+                                'ULTS' => 'ULTS',
                             ])
                             ->searchable()
                             ->required(),
