@@ -654,15 +654,16 @@
                 displayStatus = `Complaint (No.${t.vendor_complaint_id})`;
             }
 
-            let waMessage = `*${currentUserName}*\n\n`;
-            waMessage += `*Ticket No:* ${t.ticket_no || t.id}`;
+            let spacePadding = '\u00A0'.repeat(25);
+            let waMessage = `*${currentUserName}*${spacePadding}[${t.ticket_no || t.id}]\n`;
             
+            if (t.section && t.section !== '-') {
+                waMessage += `\n*Section:* ${t.section}`;
+            }
+
             let empName = getEmployeeName(t.employee_id);
             if (empName && empName !== '-' && empName !== 'Not Provided') {
                 waMessage += `\n*Requested By:* ${empName}`;
-            }
-            if (t.section && t.section !== '-') {
-                waMessage += `\n*Section:* ${t.section}`;
             }
             
             let locParts = [];
@@ -1036,11 +1037,20 @@
                     
                     const t = allTickets.find(ticket => ticket.id == id);
                     if (t) {
-                        let waMessage = `*${data.updated_by}*\n\n`;
-                        waMessage += `*Ticket No:* ${t.ticket_no}\n`;
+                        let spacePadding = '\u00A0'.repeat(25);
+                        let waMessage = `*${data.updated_by}*${spacePadding}[${t.ticket_no}]\n`;
+                        
+                        if (t.section && t.section !== '-') {
+                            waMessage += `\n*Section:* ${t.section}`;
+                        }
+
+                        let empName = getEmployeeName(t.employee_id);
+                        if (empName && empName !== '-' && empName !== 'Not Provided') {
+                            waMessage += `\n*Requested By:* ${empName}`;
+                        }
                         
                         let locStr = (t.location ? t.location.location : (t.office_location_id || '-')) + ' / ' + (t.room ? t.room.name : (t.room_id || '-'));
-                        waMessage += `*Location:* ${locStr}\n`;
+                        waMessage += `\n*Location:* ${locStr}\n`;
                         waMessage += `*Type:* ${t.complaint_type || '-'}\n`;
                         waMessage += `*Problem:* ${t.description || '-'}\n`;
 

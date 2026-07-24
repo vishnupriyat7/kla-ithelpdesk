@@ -563,14 +563,15 @@ class ComplaintRegisterResource extends Resource
                         $employeeName = static::resolveEmployeeName($record->employee_id);
                         $location = ($record->location?->location ?? '-') . ' / ' . ($record->floor ?? '-') . ' / ' . ($record->room?->name ?? '-');
                         $userName = auth()->user()->name;
-                        $message = "*{$userName}*\n\n";
-                        $message .= "*Ticket No:* {$record->ticket_no}";
+                        $spacePadding = str_repeat("\u{00A0}", 25);
+                        $message = "*{$userName}*{$spacePadding}[{$record->ticket_no}]\n";
                         
-                        if ($employeeName && $employeeName !== '-' && $employeeName !== 'Not Provided') {
-                            $message .= "\n*Requested By:* {$employeeName}";
-                        }
                         if ($record->section && $record->section !== '-') {
                             $message .= "\n*Section:* {$record->section}";
+                        }
+
+                        if ($employeeName && $employeeName !== '-' && $employeeName !== 'Not Provided') {
+                            $message .= "\n*Requested By:* {$employeeName}";
                         }
                         
                         $locParts = [];
