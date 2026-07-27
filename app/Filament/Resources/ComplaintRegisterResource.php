@@ -258,7 +258,7 @@ class ComplaintRegisterResource extends Resource
                         Forms\Components\Select::make('technician_id')
                             ->relationship('technician', 'name', fn (Builder $query) => $query->whereHas('role', fn($q) => $q->whereIn('name', ['chm', 'programmer'])))
                             ->label('Assigned Technician')
-                            ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin'])),
+                            ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin', 'cowd'])),
                         Forms\Components\Textarea::make('remarks')
                             ->columnSpanFull(),
                         Forms\Components\Hidden::make('user_id')
@@ -564,8 +564,7 @@ class ComplaintRegisterResource extends Resource
                         $employeeName = static::resolveEmployeeName($record->employee_id);
                         $location = ($record->location?->location ?? '-') . ' / ' . ($record->floor ?? '-') . ' / ' . ($record->room?->name ?? '-');
                         $userName = auth()->user()->name;
-                        $spacePadding = str_repeat("\u{00A0}", 25);
-                        $message = "*{$userName}*{$spacePadding}[{$record->ticket_no}]";
+                        $message = "*{$userName}* - _[{$record->ticket_no}]_";
                         
                         if ($record->section && $record->section !== '-') {
                             $message .= "\n*Section:* {$record->section}";

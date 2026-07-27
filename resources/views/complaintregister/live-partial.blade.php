@@ -654,8 +654,7 @@
                 displayStatus = `Complaint (No.${t.vendor_complaint_id})`;
             }
 
-            let spacePadding = '\u00A0'.repeat(25);
-            let waMessage = `*${currentUserName}*${spacePadding}[${t.ticket_no || t.id}]`;
+            let waMessage = `*${currentUserName}* - _[${t.ticket_no || t.id}]_`;
             
             if (t.section && t.section !== '-') {
                 waMessage += `\n*Section:* ${t.section}`;
@@ -1036,8 +1035,7 @@
                     
                     const t = allTickets.find(ticket => ticket.id == id);
                     if (t) {
-                        let spacePadding = '\u00A0'.repeat(25);
-                        let waMessage = `*${data.updated_by}*${spacePadding}[${t.ticket_no}]`;
+                        let waMessage = `*${data.updated_by}* - _[${t.ticket_no}]_`;
                         
                         if (t.section && t.section !== '-') {
                             waMessage += `\n*Section:* ${t.section}`;
