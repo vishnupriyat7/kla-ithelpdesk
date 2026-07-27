@@ -199,6 +199,7 @@ class ComplaintRegisterResource extends Resource
                             }),
                         Forms\Components\Select::make('complaint_type')
                             ->options(fn () => \App\Models\ComplaintType::pluck('name', 'name')->toArray())
+                            ->searchable()
                             ->required(),
                     ])->columns(2),
                 Forms\Components\Section::make('Location Details')
