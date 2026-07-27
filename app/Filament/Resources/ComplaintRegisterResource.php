@@ -565,7 +565,7 @@ class ComplaintRegisterResource extends Resource
                         $location = ($record->location?->location ?? '-') . ' / ' . ($record->floor ?? '-') . ' / ' . ($record->room?->name ?? '-');
                         $userName = auth()->user()->name;
                         $spacePadding = str_repeat("\u{00A0}", 25);
-                        $message = "*{$userName}*{$spacePadding}[{$record->ticket_no}]\n";
+                        $message = "*{$userName}*{$spacePadding}[{$record->ticket_no}]";
                         
                         if ($record->section && $record->section !== '-') {
                             $message .= "\n*Section:* {$record->section}";

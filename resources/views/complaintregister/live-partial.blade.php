@@ -655,7 +655,7 @@
             }
 
             let spacePadding = '\u00A0'.repeat(25);
-            let waMessage = `*${currentUserName}*${spacePadding}[${t.ticket_no || t.id}]\n`;
+            let waMessage = `*${currentUserName}*${spacePadding}[${t.ticket_no || t.id}]`;
             
             if (t.section && t.section !== '-') {
                 waMessage += `\n*Section:* ${t.section}`;
@@ -923,8 +923,7 @@
                         if(t.room && t.room.name) locationParts.push(t.room.name);
                         let locationStr = locationParts.join(' / ');
 
-                        let waMessage = `*Ticket Taken by ${assignedName}*\n`;
-                        waMessage += `*Ticket No:*   [${t.ticket_no}]\n`;
+                        let waMessage = `*[${t.ticket_no}]  Assigned to ${assignedName}*\n\n`;
                         waMessage += `*Section:*     ${t.section || 'N/A'}\n`;
                         if (locationStr) waMessage += `*Location / Room:* ${locationStr}\n`;
                         waMessage += `*Complaint Type:* ${t.complaint_type || 'N/A'}\n`;
@@ -1038,7 +1037,7 @@
                     const t = allTickets.find(ticket => ticket.id == id);
                     if (t) {
                         let spacePadding = '\u00A0'.repeat(25);
-                        let waMessage = `*${data.updated_by}*${spacePadding}[${t.ticket_no}]\n`;
+                        let waMessage = `*${data.updated_by}*${spacePadding}[${t.ticket_no}]`;
                         
                         if (t.section && t.section !== '-') {
                             waMessage += `\n*Section:* ${t.section}`;
