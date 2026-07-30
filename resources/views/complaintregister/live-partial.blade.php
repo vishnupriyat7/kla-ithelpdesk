@@ -207,6 +207,11 @@
 
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
         .whatsapp-container {
             height: calc(100vh - 60px);
             margin: 0;
