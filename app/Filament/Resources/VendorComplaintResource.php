@@ -129,7 +129,7 @@ class VendorComplaintResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        'Un attended' => 'danger',
+                        'Unattended' => 'danger',
                         'Pending Spare' => 'warning',
                         'Resolved' => 'success',
                         default => 'secondary',
@@ -155,7 +155,7 @@ class VendorComplaintResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'Un attended' => 'Un attended',
+                        'Unattended' => 'Unattended',
                         'Pending Spare' => 'Pending Spare',
                         'Resolved' => 'Resolved',
                     ]),
@@ -166,7 +166,8 @@ class VendorComplaintResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->hidden(fn () => auth()->user()?->getRoleName() !== 'superadmin'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
@@ -192,5 +193,14 @@ class VendorComplaintResource extends Resource
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        $role = auth()->user()->getRoleName();
+        if (in_array($role, ['admin', 'superadmin', 'hardwareadmin'])) {
+            return true;
+        }
+        return $record->user_id === auth()->id();
     }
 }

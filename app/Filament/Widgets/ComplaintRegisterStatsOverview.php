@@ -51,13 +51,48 @@ class ComplaintRegisterStatsOverview extends BaseWidget
             </div>
         ');
 
+        $tTotal = ComplaintRegister::whereDate('created_at', today())->count();
+        $tOpen = ComplaintRegister::whereDate('created_at', today())->where('status', 'Open')->count();
+        $tAssigned = ComplaintRegister::whereDate('created_at', today())->where('status', 'Assigned')->count();
+        $tPending = ComplaintRegister::whereDate('created_at', today())->where('status', 'Pending')->count();
+        $tComplaint = ComplaintRegister::whereDate('created_at', today())->where('status', 'Complaint')->count();
+        $tResolvedTotal = ComplaintRegister::whereDate('created_at', today())->where('status', 'Resolved')->count();
+
+        $todayBadges = new \Illuminate\Support\HtmlString('
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; width: 100%;">
+                <a href="' . $url . '?status=Open&scope=all" style="background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span style="font-weight: 500; font-size: 0.75rem;">Open</span>
+                    <strong style="font-size: 0.875rem;">' . $tOpen . '</strong>
+                </a>
+                <a href="' . $url . '?status=Assigned&scope=all" style="background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span style="font-weight: 500; font-size: 0.75rem;">Assigned</span>
+                    <strong style="font-size: 0.875rem;">' . $tAssigned . '</strong>
+                </a>
+                <a href="' . $url . '?status=Pending&scope=all" style="background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span style="font-weight: 500; font-size: 0.75rem;">Pending</span>
+                    <strong style="font-size: 0.875rem;">' . $tPending . '</strong>
+                </a>
+                <a href="' . $url . '?status=Complaint&scope=all" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span style="font-weight: 500; font-size: 0.75rem;">Complaint</span>
+                    <strong style="font-size: 0.875rem;">' . $tComplaint . '</strong>
+                </a>
+                <a href="' . $url . '?status=Resolved&scope=all" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 2px 8px; border-radius: 6px; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                    <span style="font-weight: 500; font-size: 0.75rem;">Resolved</span>
+                    <strong style="font-size: 0.875rem;">' . $tResolvedTotal . '</strong>
+                </a>
+            </div>
+            <div style="margin-top: 12px;">
+                <a href="' . $url . '" style="color: blue; text-decoration: underline; font-size: 0.875rem;">Go to Live Board</a>
+            </div>
+        ');
+
         $stats = [
             Stat::make('Total TicketCount', $gTotal)
                 ->description($globalBadges)
                 ->color('primary'),
                 
-            Stat::make('Total Open Tickets', $gOpen)
-                ->description(new \Illuminate\Support\HtmlString('<a href="' . url('/admin/complaint-live-screen') . '" style="color: blue; text-decoration: underline;">Go to Live Board</a>'))
+            Stat::make('Today\'s Ticket Counts', $tTotal)
+                ->description($todayBadges)
                 ->color('warning'),
                 
             Stat::make('Resolved Today', $gResolved)
@@ -67,7 +102,7 @@ class ComplaintRegisterStatsOverview extends BaseWidget
                 
             Stat::make('Vendor Complaints', \App\Models\VendorComplaint::count())
                 ->description(new \Illuminate\Support\HtmlString(
-                    '<span style="color: #ef4444;">Un attended: ' . \App\Models\VendorComplaint::where('status', 'Un attended')->count() . '</span> | ' .
+                    '<span style="color: #ef4444;">Unattended: ' . \App\Models\VendorComplaint::where('status', 'Unattended')->count() . '</span> | ' .
                     '<span style="color: #f59e0b;">Pending Spare: ' . \App\Models\VendorComplaint::where('status', 'Pending Spare')->count() . '</span> | ' .
                     '<span style="color: #22c55e;">Resolved: ' . \App\Models\VendorComplaint::where('status', 'Resolved')->count() . '</span>'
                 ))

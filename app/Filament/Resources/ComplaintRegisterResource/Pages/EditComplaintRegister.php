@@ -14,7 +14,7 @@ class EditComplaintRegister extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->hidden(fn () => auth()->user()?->getRoleName() === 'chm'),
+                ->hidden(fn () => auth()->user()?->getRoleName() !== 'superadmin'),
         ];
     }
 

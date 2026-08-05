@@ -731,6 +731,8 @@
             let finalStatusStrDisplay = displayStatus;
             if (t.status === 'Resolved' && waResolvedStatus) {
                 finalStatusStrDisplay += ` , ${waResolvedStatus}`;
+            } else if (t.status === 'Assigned' && t.technician) {
+                finalStatusStrDisplay += ` -> ${t.technician.name}`;
             }
 
             let statusEmoji = '';
@@ -927,11 +929,29 @@
                         if(t.room && t.room.name) locationParts.push(t.room.name);
                         let locationStr = locationParts.join(' / ');
 
-                        let waMessage = `*[${t.ticket_no}]  Assigned to ${assignedName}*\n\n`;
-                        waMessage += `*Section:*     ${t.section || 'N/A'}\n`;
-                        if (locationStr) waMessage += `*Location / Room:* ${locationStr}\n`;
-                        waMessage += `*Complaint Type:* ${t.complaint_type || 'N/A'}\n`;
-                        if (t.description) waMessage += `*Description:* _${t.description}_`;
+                        let waMessage = `*${currentUserName}* - _[${t.ticket_no || t.id}]_`;
+                        
+                        if (t.section && t.section !== '-') {
+                            waMessage += `\n*Section:* ${t.section}`;
+                        }
+
+                        let empName = getEmployeeName(t.employee_id);
+                        if (empName && empName !== '-' && empName !== 'Not Provided') {
+                            waMessage += `\n*Requested By:* ${empName}`;
+                        }
+                        
+                        if (locationStr) {
+                            waMessage += `\n*Location:* ${locationStr}`;
+                        }
+                        
+                        if (t.complaint_type && t.complaint_type !== '-') {
+                            waMessage += `\n*Type:* ${t.complaint_type}`;
+                        }
+                        if (t.description && t.description !== '-') {
+                            waMessage += `\n*Problem:* ${t.description}`;
+                        }
+                        
+                        waMessage += `\n\n*Status:* Assigned -> ${assignedName} \u{1F7E1}`;
                         
                         document.getElementById('btnAssignWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
                         document.getElementById('assignSuccessMessage').innerText = data.message;
@@ -1092,6 +1112,8 @@
                         let displayStatus = status === 'Unassign' ? 'Open' : status;
                         if (status === 'Resolved' && waResolvedStatus) {
                             displayStatus += ` , ${waResolvedStatus}`;
+                        } else if (status === 'Assigned' && data.updated_by) {
+                            displayStatus += ` -> ${data.updated_by}`;
                         }
                         
                         let statusEmoji = '';

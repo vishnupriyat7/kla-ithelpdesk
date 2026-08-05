@@ -632,6 +632,8 @@ class ComplaintRegisterResource extends Resource
                         $displayStatus = $record->status;
                         if ($record->status === 'Resolved' && $waResolvedStatus) {
                             $displayStatus .= " , {$waResolvedStatus}";
+                        } elseif ($record->status === 'Assigned' && $record->technician) {
+                            $displayStatus .= " -> {$record->technician->name}";
                         }
                         
                         $statusEmoji = '';
@@ -650,7 +652,7 @@ class ComplaintRegisterResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->hidden(fn () => auth()->user()?->getRoleName() === 'chm'),
+                        ->hidden(fn () => auth()->user()?->getRoleName() !== 'superadmin'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
