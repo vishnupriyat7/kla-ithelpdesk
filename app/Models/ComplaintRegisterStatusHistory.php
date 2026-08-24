@@ -13,6 +13,7 @@ class ComplaintRegisterStatusHistory extends Model
         'status',
         'remarks',
         'technician_id',
+        'created_at',
     ];
 
     public function ticket()

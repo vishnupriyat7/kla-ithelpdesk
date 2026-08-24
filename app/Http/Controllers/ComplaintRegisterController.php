@@ -132,11 +132,15 @@ class ComplaintRegisterController extends Controller
         $status = $request->input('status', 'Resolved');
 
         if ($status === 'Unassign') {
-            $ticket->update([
+            $updateData = [
                 'status' => 'Open',
                 'technician_id' => null,
                 'remarks' => $request->input('remarks'),
-            ]);
+            ];
+            if ($request->filled('custom_status_date')) {
+                $updateData['custom_status_date'] = $request->input('custom_status_date');
+            }
+            $ticket->update($updateData);
 
             return response()->json([
                 'success' => true,
@@ -154,11 +158,16 @@ class ComplaintRegisterController extends Controller
             }
         }
 
-        $ticket->update([
+        $updateData = [
             'status' => $status,
             'remarks' => $request->input('remarks'),
             'vendor_complaint_id' => $vendor_complaint_id,
-        ]);
+        ];
+        if ($request->filled('custom_status_date')) {
+            $updateData['custom_status_date'] = $request->input('custom_status_date');
+        }
+
+        $ticket->update($updateData);
 
         if ($status === 'Complaint' && $vendor_complaint_id) {
             \App\Models\VendorComplaint::updateOrCreate(

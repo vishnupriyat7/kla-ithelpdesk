@@ -984,6 +984,7 @@
         document.getElementById('modalVendorComplaintId').value = t.vendor_complaint_id || '';
         document.getElementById('modalResolvedStatus').value = '';
         document.getElementById('modalHelpedBy').value = '';
+        document.getElementById('modalStatusDate').value = '';
 
         toggleComplaintLink();
 
@@ -1048,7 +1049,8 @@
                 vendor_complaint_id: vendor_complaint_id,
                 vendor_name: vendor_name,
                 vendor_status: vendor_status,
-                vendor_description: vendor_description
+                vendor_description: vendor_description,
+                custom_status_date: document.getElementById('modalStatusDate').value
             })
         })
             .then(res => res.json())
@@ -1219,6 +1221,10 @@
                         <option value="Resolved">Resolved</option>
                         <option value="Unassign">Unassign</option>
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label for="modalStatusDate" class="form-label">Status Update Date & Time (Optional)</label>
+                    <input type="datetime-local" class="form-control form-control-sm" id="modalStatusDate">
                 </div>
                 <div class="mb-3" id="resolvedOptionsDiv" style="display: none; background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0;">
                     <div class="mb-2">

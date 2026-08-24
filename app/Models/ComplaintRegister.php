@@ -23,7 +23,21 @@ class ComplaintRegister extends Model
         'remarks',
         'vendor_complaint_id',
         'user_id',
+        'created_at',
+        'custom_status_date',
     ];
+
+    public $custom_status_date_temp = null;
+
+    public function setCustomStatusDateAttribute($value)
+    {
+        $this->custom_status_date_temp = $value;
+    }
+
+    public function getCustomStatusDateAttribute()
+    {
+        return $this->custom_status_date_temp;
+    }
 
     public function technician()
     {
@@ -120,11 +134,17 @@ class ComplaintRegister extends Model
                     return;
                 }
 
-                $ticket->statusHistories()->create([
+                $historyData = [
                     'status' => $newStatus,
                     'remarks' => $newRemarks,
                     'technician_id' => $ticket->technician_id,
-                ]);
+                ];
+
+                if (!empty($ticket->custom_status_date_temp)) {
+                    $historyData['created_at'] = $ticket->custom_status_date_temp;
+                }
+
+                $ticket->statusHistories()->create($historyData);
             }
         });
     }

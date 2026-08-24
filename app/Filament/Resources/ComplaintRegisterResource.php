@@ -85,6 +85,12 @@ class ComplaintRegisterResource extends Resource
                             ->disabled(fn () => !in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin']))
                             ->hiddenOn('create')
                             ->dehydrated(fn () => in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin'])),
+                        Forms\Components\DateTimePicker::make('custom_status_date')
+                            ->label('Status Update Date & Time (Optional)')
+                            ->hiddenOn('create')
+                            ->visible(fn () => auth()->check() && in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin', 'chm']))
+                            ->dehydrated(true)
+                            ->dehydrateStateUsing(fn ($state) => $state ?? now()),
                         Forms\Components\Select::make('section')
                             ->label('Section')
                             ->options(function (Forms\Get $get) {
@@ -201,6 +207,12 @@ class ComplaintRegisterResource extends Resource
                             ->options(fn () => \App\Models\ComplaintType::pluck('name', 'name')->toArray())
                             ->searchable()
                             ->required(),
+                        Forms\Components\DateTimePicker::make('created_at')
+                            ->label('Reported Date & Time (Leave empty for current time)')
+                            ->default(now())
+                            ->visible(fn () => auth()->check() && in_array(auth()->user()->getRoleName(), ['admin', 'superadmin', 'hardwareadmin', 'chm']))
+                            ->dehydrated(true)
+                            ->dehydrateStateUsing(fn ($state) => $state ?? now()),
                     ])->columns(2),
                 Forms\Components\Section::make('Location Details')
                     ->schema([
