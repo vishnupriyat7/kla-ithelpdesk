@@ -226,7 +226,7 @@ class WhatsAppChatImporter
         for ($i = 0; $i < count($messages); $i++) {
             $info = $this->extractQuoteInfo($messages[$i]['text']);
             if ($info) {
-                $qBodyClean = mb_strtolower(trim(preg_replace('/[\p{Emoji_Presentation}\p{Extended_Pictographic}\x{200d}\x{fe0f}]/u', '', $info['body'])));
+                $qBodyClean = mb_strtolower(trim($this->stripEmojis($info['body'])));
 
                 for ($b = $i - 1; $b >= 0; $b--) {
                     $prev = $messages[$b];
@@ -237,7 +237,7 @@ class WhatsAppChatImporter
                     }
 
                     $prevWithoutQuote = preg_replace('/^>.*?\n\n?/s', '', trim($prev['text']));
-                    $prevClean = mb_strtolower(trim(preg_replace('/[\p{Emoji_Presentation}\p{Extended_Pictographic}\x{200d}\x{fe0f}]/u', '', $prevWithoutQuote)));
+                    $prevClean = mb_strtolower(trim($this->stripEmojis($prevWithoutQuote)));
 
                     // Both are emoji acknowledgments (e.g. ✋ or 🙋)
                     if ($qBodyClean === '' && $prevClean === '') {
@@ -426,7 +426,7 @@ class WhatsAppChatImporter
             // If message is a follow-up or resolution with content, collect notes
             if ($idx !== $indices[0] && $body !== '') {
                 // If it's not just a bare ack emoji
-                $withoutEmoji = trim(preg_replace('/[\p{Emoji_Presentation}\p{Extended_Pictographic}\x{200d}\x{fe0f}]/u', '', $body));
+                $withoutEmoji = trim($this->stripEmojis($body));
                 if ($withoutEmoji !== '' && !preg_match('/^reminder$/i', $withoutEmoji)) {
                     $resolutionNotes[] = "[{$msg['sender']}]: {$body}";
                 }
@@ -735,5 +735,14 @@ class WhatsAppChatImporter
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Remove emojis and pictographs using standard hexadecimal unicode ranges.
+     * Compatible with all PCRE and PHP versions.
+     */
+    protected function stripEmojis(string $text): string
+    {
+        return preg_replace('/[\x{1F000}-\x{1FFFF}\x{2600}-\x{27BF}\x{200d}\x{fe0f}\p{So}]/u', '', $text) ?? $text;
     }
 }
