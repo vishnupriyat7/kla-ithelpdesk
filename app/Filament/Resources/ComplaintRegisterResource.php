@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ComplaintRegisterResource\Pages;
 use App\Filament\Resources\ComplaintRegisterResource\RelationManagers;
 use App\Models\ComplaintRegister;
+use App\Exports\ComplaintRegisterExport;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -14,7 +15,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ComplaintRegisterResource extends Resource
 {
@@ -665,6 +668,22 @@ class ComplaintRegisterResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->hidden(fn () => auth()->user()?->getRoleName() !== 'superadmin'),
+                    Tables\Actions\BulkAction::make('export_selected_excel')
+                        ->label('Export Selected to Excel (.xlsx)')
+                        ->icon('heroicon-o-table-cells')
+                        ->color('success')
+                        ->action(function (Collection $records) {
+                            $filename = 'Selected_Complaints_' . date('Y-m-d_His') . '.xlsx';
+                            return Excel::download(new ComplaintRegisterExport($records), $filename);
+                        }),
+                    Tables\Actions\BulkAction::make('export_selected_csv')
+                        ->label('Export Selected to CSV (.csv)')
+                        ->icon('heroicon-o-document-text')
+                        ->color('primary')
+                        ->action(function (Collection $records) {
+                            $filename = 'Selected_Complaints_' . date('Y-m-d_His') . '.csv';
+                            return Excel::download(new ComplaintRegisterExport($records), $filename, \Maatwebsite\Excel\Excel::CSV);
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
