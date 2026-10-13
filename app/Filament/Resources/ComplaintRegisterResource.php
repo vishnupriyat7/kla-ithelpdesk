@@ -226,8 +226,7 @@ class ComplaintRegisterResource extends Resource
                             ->afterStateUpdated(function (Forms\Set $set) {
                                 $set('floor', null);
                                 $set('room_id', null);
-                            })
-                            ->required(),
+                            }),
                         Forms\Components\Select::make('floor')
                             ->label('Floor')
                             ->options(function (Forms\Get $get) {
