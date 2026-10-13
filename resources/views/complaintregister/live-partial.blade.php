@@ -745,10 +745,10 @@
             let finalStatusStr = `${finalStatusStrDisplay} ${statusEmoji}`.trim();
             waMessage += `\n\n*Status:* ${finalStatusStr}`;
 
-            let waUrl = 'https://wa.me/?text=' + encodeURIComponent(waMessage);
+            let waUrl = 'whatsapp://send?text=' + encodeURIComponent(waMessage);
 
             actionButtons = `
-                <a href="${waUrl}" target="_blank" class="btn btn-sm me-2" style="background-color: #25D366; color: white; border: none;" title="Push to WhatsApp">
+                <a href="${waUrl}" class="btn btn-sm me-2" style="background-color: #25D366; color: white; border: none;" title="Push to WhatsApp">
                     <i class="bi bi-whatsapp"></i>
                 </a>
             ` + actionButtons;
@@ -953,7 +953,7 @@
                         
                         waMessage += `\n\n*Status:* Assigned -> ${assignedName} \u{1F7E1}`;
                         
-                        document.getElementById('btnAssignWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
+                        document.getElementById('btnAssignWa').href = 'whatsapp://send?text=' + encodeURIComponent(waMessage);
                         document.getElementById('assignSuccessMessage').innerText = data.message;
                         
                         var modal = new bootstrap.Modal(document.getElementById('assignSuccessModal'));
@@ -1132,7 +1132,7 @@
                         let finalStatusStr = `${displayStatus} ${statusEmoji}`.trim();
                         waMessage += `\n*Status:* ${finalStatusStr}`;
                         
-                        document.getElementById('btnUpdateWa').href = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(waMessage);
+                        document.getElementById('btnUpdateWa').href = 'whatsapp://send?text=' + encodeURIComponent(waMessage);
                         document.getElementById('updateSuccessMessage').innerText = data.message;
                         
                         var updateModal = new bootstrap.Modal(document.getElementById('updateSuccessModal'));
@@ -1173,7 +1173,7 @@
                 
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn btn-outline-secondary px-4 py-2 fw-bold" data-bs-dismiss="modal">Close</button>
-                    <a href="#" target="_blank" id="btnAssignWa" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('assignSuccessModal')).hide(); }, 500);">
+                    <a href="#" id="btnAssignWa" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('assignSuccessModal')).hide(); }, 500);">
                         <i class="bi bi-whatsapp me-2"></i> Notify IT Cell Group
                     </a>
                 </div>
@@ -1193,7 +1193,7 @@
                 
                 <div class="d-flex justify-content-center gap-3">
                     <button type="button" class="btn btn-outline-secondary px-4 py-2 fw-bold" data-bs-dismiss="modal">Close</button>
-                    <a href="#" target="_blank" id="btnUpdateWa" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('updateSuccessModal')).hide(); }, 500);">
+                    <a href="#" id="btnUpdateWa" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('updateSuccessModal')).hide(); }, 500);">
                         <i class="bi bi-whatsapp me-2"></i> Notify IT Cell Group
                     </a>
                 </div>

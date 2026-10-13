@@ -660,9 +660,8 @@ class ComplaintRegisterResource extends Resource
                         
                         $message .= "\n\n*Status:* " . trim("{$displayStatus} {$statusEmoji}");
                         
-                        return 'https://wa.me/?text=' . urlencode($message);
-                    })
-                    ->openUrlInNewTab(),
+                        return 'whatsapp://send?text=' . rawurlencode($message);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
