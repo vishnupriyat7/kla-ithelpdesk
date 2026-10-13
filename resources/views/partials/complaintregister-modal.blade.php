@@ -13,7 +13,7 @@
         $waMessage .= "*Location / Room:* " . $locationStr . "\n";
         $waMessage .= "*Complaint Type:* " . $ticket->complaint_type . "\n";
         $waMessage .= "*Description:* _" . $ticket->description . "_";
-        $waText = rawurlencode($waMessage);
+        $waText = urlencode($waMessage);
     }
 @endphp
 <script>
@@ -48,7 +48,7 @@
                         Close
                     </button>
                     @if(session('ticket'))
-                    <a href="whatsapp://send?text={{ $waText }}" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('successModal')).hide(); }, 500);">
+                    <a href="https://api.whatsapp.com/send?text={{ $waText }}" target="_blank" class="btn btn-success px-4 py-2 fw-bold" style="background-color: #25D366; border-color: #25D366;" onclick="setTimeout(function(){ bootstrap.Modal.getInstance(document.getElementById('successModal')).hide(); }, 500);">
                         <i class="bi bi-whatsapp me-2"></i> Notify IT Cell Group
                     </a>
                     @endif
