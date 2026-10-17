@@ -28,6 +28,14 @@ class AdminPanelProvider extends PanelProvider
                 fn(): string => \Illuminate\Support\Facades\Blade::render('@pwaHead @laravelPwa')
             )
             ->renderHook(
+                \Filament\View\PanelsRenderHook::BODY_END,
+                fn(): string => auth()->check()
+                    && \App\Filament\Resources\ComplaintRegisterResource::canCreate()
+                    && ! request()->routeIs('filament.admin.resources.*.create', 'filament.admin.resources.*.edit')
+                        ? view('filament.components.mobile-new-complaint-button')->render()
+                        : ''
+            )
+            ->renderHook(
                 \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
                 fn(): string => auth()->check() ? '<div class="text-sm font-semibold dark:text-gray-300" style="margin-right: 12px; margin-left: 12px; display: flex; align-items: center;">' . auth()->user()->name . '</div>' : ''
             )

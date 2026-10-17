@@ -44,15 +44,16 @@ self.addEventListener("fetch", (event) => {
 
     const request = event.request;
 
-    // ✅ Never cache non-GET requests (fix Cache.put POST error)
+    // ✅ Never cache non-GET requests (fix Cache.put POST error).
+    // Returning without respondWith() lets the browser handle the request natively,
+    // so a dropped connection or redirect can't surface as a service worker
+    // "Failed to fetch" error.
     if (request.method !== 'GET') {
-        event.respondWith(fetch(request));
         return;
     }
 
     // ✅ Bypass Livewire and Filament admin routes completely
     if (request.url.includes('/livewire/') || request.url.includes('/admin')) {
-        event.respondWith(fetch(request));
         return;
     }
 
