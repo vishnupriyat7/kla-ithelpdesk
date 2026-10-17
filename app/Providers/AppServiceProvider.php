@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Tables\Columns\Column;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Tag every table cell with its column label so the mobile CSS in
+        // AdminPanelProvider can show each row as a labelled card.
+        Column::configureUsing(function (Column $column): void {
+            $column->extraCellAttributes(fn (): array => ['data-label' => $column->getLabel()], merge: true);
+        });
+
         // In production every generated URL (links, assets, redirects, emails) uses APP_URL,
         // e.g. https://ithelpdesk.niyamasabha.org, whatever host the request arrived on.
         if ($this->app->environment('production')) {

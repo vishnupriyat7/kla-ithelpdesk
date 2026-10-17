@@ -89,6 +89,140 @@ class AdminPanelProvider extends PanelProvider
                         letter-spacing: 0.1em !important;
                         margin-top: 1rem !important;
                     }
+
+                    /* Mobile / installed PWA: Filament sizes everything in rem, so raising the
+                       root font size scales menus, labels, inputs and buttons together. */
+                    @media (max-width: 1023px) {
+                        html {
+                            font-size: 112.5%; /* 16px -> 18px base, text-sm becomes ~16px */
+                        }
+                        aside.fi-sidebar {
+                            max-width: 85vw;
+                        }
+                        .fi-sidebar-item-button {
+                            padding-top: 0.625rem !important;
+                            padding-bottom: 0.625rem !important;
+                        }
+                        .fi-sidebar-item-label {
+                            font-size: 1rem !important;
+                        }
+                        .fi-sidebar-item-icon {
+                            width: 1.5rem !important;
+                            height: 1.5rem !important;
+                        }
+                    }
+
+                    /* Phones: show table rows as cards instead of a wide sideways-scrolling table.
+                       Each cell gets its column label via data-label (see AppServiceProvider). */
+                    @media (max-width: 767px) {
+                        .fi-ta-table,
+                        .fi-ta-table > tbody {
+                            display: block;
+                            width: 100%;
+                        }
+                        .fi-ta-table > thead {
+                            display: none;
+                        }
+                        .fi-ta-table > tbody {
+                            white-space: normal;
+                            border: 0 !important;
+                            padding: 0.75rem;
+                        }
+                        .fi-ta-table > tbody > tr.fi-ta-row:not(.hidden) {
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            margin-bottom: 0.75rem;
+                            padding: 0.5rem 0.875rem;
+                            border: 1px solid rgb(229 231 235);
+                            border-radius: 0.75rem;
+                            background: #fff;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                        }
+                        .dark .fi-ta-table > tbody > tr.fi-ta-row:not(.hidden) {
+                            border-color: rgba(255, 255, 255, 0.1);
+                            background: rgba(255, 255, 255, 0.03);
+                        }
+                        .fi-ta-row > td.fi-ta-cell:not(.hidden) {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                            padding: 0 !important;
+                            border-bottom: 1px dashed rgb(243 244 246);
+                        }
+                        .dark .fi-ta-row > td.fi-ta-cell:not(.hidden) {
+                            border-bottom-color: rgba(255, 255, 255, 0.05);
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label]::before {
+                            content: attr(data-label);
+                            flex: 0 0 38%;
+                            font-size: 0.8125rem;
+                            font-weight: 500;
+                            color: rgb(107 114 128);
+                        }
+                        .fi-ta-row > td.fi-ta-cell > .fi-ta-col-wrp {
+                            flex: 1;
+                            min-width: 0;
+                            overflow-wrap: anywhere;
+                        }
+                        .fi-ta-row > td.fi-ta-cell .fi-ta-col-wrp > * > div.px-3 {
+                            padding: 0.5rem 0 !important;
+                        }
+                        /* Checkbox in the card corner */
+                        .fi-ta-row > td.fi-ta-selection-cell {
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            border-bottom: 0 !important;
+                        }
+                        /* Action buttons along the bottom of the card */
+                        .fi-ta-row > td.fi-ta-actions-cell {
+                            border-bottom: 0 !important;
+                        }
+                        .fi-ta-row > td.fi-ta-actions-cell > div {
+                            width: 100%;
+                            padding: 0.5rem 0 0.25rem !important;
+                        }
+                        .fi-ta-row > td.fi-ta-actions-cell .fi-ta-actions {
+                            justify-content: flex-end;
+                            gap: 0.5rem;
+                        }
+                        .fi-ta-row > td.fi-ta-actions-cell .fi-icon-btn {
+                            width: 2.5rem;
+                            height: 2.5rem;
+                        }
+                        /* Keep the toolbar (search, filters, column toggle) on one usable row */
+                        .fi-ta-header-toolbar {
+                            flex-wrap: wrap;
+                            gap: 0.5rem;
+                        }
+                        .fi-ta-search-field {
+                            flex: 1 1 100%;
+                        }
+                        /* Page header buttons (Create, Export...) wrap instead of overflowing */
+                        .fi-header {
+                            gap: 0.75rem;
+                        }
+                        .fi-header .fi-ac {
+                            flex-wrap: wrap;
+                        }
+                        /* Forms: 16px+ text avoids the browser zooming into fields, bigger tap targets */
+                        .fi-input,
+                        .fi-select-input,
+                        .fi-fo-textarea textarea,
+                        .choices__inner {
+                            font-size: max(16px, 0.875rem) !important;
+                        }
+                        .fi-btn {
+                            min-height: 2.75rem;
+                        }
+                        .fi-section-content-ctn .fi-section-content {
+                            padding: 1rem;
+                        }
+                        .fi-pagination {
+                            gap: 0.5rem;
+                        }
+                    }
                 </style>
                 '
             )
