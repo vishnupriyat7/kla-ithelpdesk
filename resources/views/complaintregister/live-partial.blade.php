@@ -354,6 +354,71 @@
             white-space: nowrap;
             justify-content: flex-start;
         }
+
+        /* Phones: all five tabs fit on screen, count on top and label below */
+        .chat-tabs-header .chat-tab {
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 2px;
+            font-size: 12px;
+        }
+
+        .chat-tabs-header .chat-tab .badge {
+            margin-left: 0 !important;
+            padding: 3px 8px;
+            font-size: 14px;
+        }
+
+        .chat-search input {
+            font-size: 16px; /* 16px stops the phone zooming in on focus */
+            padding: 10px 12px;
+        }
+
+        /* Bigger, easier to read ticket rows */
+        .chat-item {
+            padding: 12px 14px;
+        }
+
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 17px;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chat-time {
+            font-size: 12.5px;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .chat-message {
+            font-size: 14px;
+            color: #3b4a54;
+            white-space: normal;
+        }
+
+        .chat-message.mt-1 {
+            font-size: 13px !important;
+        }
+
+        .ticket-details table {
+            font-size: 15px;
+        }
+
+        .ticket-details .lbl {
+            width: 105px;
+        }
     }
 </style>
 

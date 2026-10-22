@@ -120,9 +120,10 @@ class AdminPanelProvider extends PanelProvider
                         }
                     }
 
-                    /* Phones: show table rows as cards instead of a wide sideways-scrolling table.
+                    /* Phones and small tablets (same breakpoint as the slide-out sidebar): show table
+                       rows as cards instead of a wide sideways-scrolling table.
                        Each cell gets its column label via data-label (see AppServiceProvider). */
-                    @media (max-width: 767px) {
+                    @media (max-width: 1023px) {
                         .fi-ta-table,
                         .fi-ta-table > tbody {
                             display: block;
@@ -135,35 +136,53 @@ class AdminPanelProvider extends PanelProvider
                             white-space: normal;
                             border: 0 !important;
                             padding: 0.75rem;
+                            background: rgb(249 250 251);
+                        }
+                        .dark .fi-ta-table > tbody {
+                            background: transparent;
                         }
                         .fi-ta-table > tbody > tr.fi-ta-row:not(.hidden) {
                             position: relative;
                             display: flex;
-                            flex-direction: column;
+                            flex-wrap: wrap;
+                            align-items: center;
                             margin-bottom: 0.75rem;
-                            padding: 0.5rem 0.875rem;
+                            padding: 0.75rem 1rem 0.25rem;
                             border: 1px solid rgb(229 231 235);
-                            border-radius: 0.75rem;
+                            border-left: 4px solid rgb(156 163 175);
+                            border-radius: 0.875rem;
                             background: #fff;
-                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
                         }
                         .dark .fi-ta-table > tbody > tr.fi-ta-row:not(.hidden) {
                             border-color: rgba(255, 255, 255, 0.1);
                             background: rgba(255, 255, 255, 0.03);
                         }
+                        /* Coloured left edge so the status can be seen while scrolling */
+                        .fi-ta-table > tbody > tr.fi-ta-row:has(td[data-label="Status"] .fi-color-danger) {
+                            border-left-color: rgb(244 63 94);
+                        }
+                        .fi-ta-table > tbody > tr.fi-ta-row:has(td[data-label="Status"] .fi-color-warning) {
+                            border-left-color: rgb(249 115 22);
+                        }
+                        .fi-ta-table > tbody > tr.fi-ta-row:has(td[data-label="Status"] .fi-color-success) {
+                            border-left-color: rgb(16 185 129);
+                        }
                         .fi-ta-row > td.fi-ta-cell:not(.hidden) {
                             display: flex;
+                            flex: 1 1 100%;
                             align-items: center;
                             gap: 0.75rem;
                             padding: 0 !important;
-                            border-bottom: 1px dashed rgb(243 244 246);
+                            border-bottom: 0;
                         }
-                        .dark .fi-ta-row > td.fi-ta-cell:not(.hidden) {
-                            border-bottom-color: rgba(255, 255, 255, 0.05);
+                        /* Blank text columns (no Complaint ID, no room...) are left out of the card */
+                        .fi-ta-row > td.fi-ta-cell:has(.fi-ta-text):not(:has(.fi-ta-text-item, .fi-ta-placeholder)) {
+                            display: none !important;
                         }
                         .fi-ta-row > td.fi-ta-cell[data-label]::before {
                             content: attr(data-label);
-                            flex: 0 0 38%;
+                            flex: 0 0 6.5rem;
                             font-size: 0.8125rem;
                             font-weight: 500;
                             color: rgb(107 114 128);
@@ -174,38 +193,101 @@ class AdminPanelProvider extends PanelProvider
                             overflow-wrap: anywhere;
                         }
                         .fi-ta-row > td.fi-ta-cell .fi-ta-col-wrp > * > div.px-3 {
-                            padding: 0.5rem 0 !important;
+                            padding: 0.3125rem 0 !important;
+                        }
+                        /* Card header: ticket number on the left, status badge on the right */
+                        .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"],
+                        .fi-ta-row > td.fi-ta-cell[data-label="Status"] {
+                            padding-bottom: 0.375rem !important;
+                            margin-bottom: 0.25rem;
+                            border-bottom: 1px solid rgb(243 244 246);
+                        }
+                        .dark .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"],
+                        .dark .fi-ta-row > td.fi-ta-cell[data-label="Status"] {
+                            border-bottom-color: rgba(255, 255, 255, 0.08);
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"] {
+                            flex: 1 1 auto;
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Status"] {
+                            flex: 0 0 auto;
+                            padding-right: 2rem !important; /* room for the selection checkbox */
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"]::before,
+                        .fi-ta-row > td.fi-ta-cell[data-label="Status"]::before {
+                            content: none;
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"] .fi-ta-text-item-label {
+                            font-size: 1.0625rem;
+                            font-weight: 700;
+                            color: rgb(var(--primary-600));
+                        }
+                        .dark .fi-ta-row > td.fi-ta-cell[data-label="Ticket #"] .fi-ta-text-item-label {
+                            color: rgb(var(--primary-400));
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Status"] .fi-badge {
+                            font-size: 0.8125rem;
+                            padding: 0.25rem 0.625rem;
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Section"] .fi-ta-text-item-label {
+                            font-weight: 600;
+                        }
+                        .fi-ta-row > td.fi-ta-cell[data-label="Raised At"] .fi-ta-text-item-label {
+                            font-size: 0.8125rem;
+                            color: rgb(107 114 128);
                         }
                         /* Checkbox in the card corner */
                         .fi-ta-row > td.fi-ta-selection-cell {
                             position: absolute;
-                            top: 0;
-                            right: 0;
+                            top: 0.375rem;
+                            right: 0.25rem;
                             border-bottom: 0 !important;
                         }
                         /* Action buttons along the bottom of the card */
                         .fi-ta-row > td.fi-ta-actions-cell {
+                            flex: 1 1 100%;
+                            margin-top: 0.375rem;
+                            border-top: 1px solid rgb(243 244 246);
                             border-bottom: 0 !important;
+                        }
+                        .dark .fi-ta-row > td.fi-ta-actions-cell {
+                            border-top-color: rgba(255, 255, 255, 0.08);
                         }
                         .fi-ta-row > td.fi-ta-actions-cell > div {
                             width: 100%;
-                            padding: 0.5rem 0 0.25rem !important;
+                            padding: 0.5rem 0 !important;
                         }
                         .fi-ta-row > td.fi-ta-actions-cell .fi-ta-actions {
                             justify-content: flex-end;
-                            gap: 0.5rem;
+                            gap: 0.625rem;
                         }
                         .fi-ta-row > td.fi-ta-actions-cell .fi-icon-btn {
-                            width: 2.5rem;
-                            height: 2.5rem;
+                            width: 2.75rem;
+                            height: 2.75rem;
+                            border-radius: 0.75rem;
+                            background: rgb(243 244 246);
                         }
-                        /* Keep the toolbar (search, filters, column toggle) on one usable row */
+                        .dark .fi-ta-row > td.fi-ta-actions-cell .fi-icon-btn {
+                            background: rgba(255, 255, 255, 0.06);
+                        }
+                        .fi-ta-row > td.fi-ta-actions-cell .fi-icon-btn svg {
+                            width: 1.375rem;
+                            height: 1.375rem;
+                        }
+                        /* Search box takes the whole toolbar row, filters/columns buttons beside it */
                         .fi-ta-header-toolbar {
-                            flex-wrap: wrap;
                             gap: 0.5rem;
+                            padding: 0.75rem !important;
+                        }
+                        .fi-ta-header-toolbar > .ms-auto {
+                            flex: 1 1 auto;
+                            min-width: 0;
+                            margin-inline-start: 0;
+                            gap: 0.75rem;
                         }
                         .fi-ta-search-field {
-                            flex: 1 1 100%;
+                            flex: 1 1 auto;
+                            min-width: 0;
                         }
                         /* Page header buttons (Create, Export...) wrap instead of overflowing */
                         .fi-header {
@@ -214,6 +296,76 @@ class AdminPanelProvider extends PanelProvider
                         .fi-header .fi-ac {
                             flex-wrap: wrap;
                         }
+                        /* Dashboard stat cards: two per row instead of three or four cramped ones */
+                        .fi-wi-stats-overview-stats-ctn {
+                            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                            gap: 1rem !important;
+                        }
+                        .fi-wi-stats-overview-stat {
+                            padding: 1.25rem !important;
+                        }
+                        /* Status chips under each stat: bigger tap targets and text */
+                        .fi-wi-stats-overview-stat-description a {
+                            padding: 0.375rem 0.625rem !important;
+                            border-radius: 0.5rem !important;
+                            gap: 0.375rem !important;
+                        }
+                        .fi-wi-stats-overview-stat-description a span {
+                            font-size: 0.8125rem !important;
+                        }
+                        .fi-wi-stats-overview-stat-description a strong {
+                            font-size: 0.9375rem !important;
+                        }
+                        /* "Go to Live Board" as a button instead of a small blue link */
+                        .fi-wi-stats-overview-stat-description a[href$="/admin/complaint-live-screen"] {
+                            display: inline-flex !important;
+                            padding: 0.5rem 0.875rem !important;
+                            border-radius: 0.625rem !important;
+                            background: rgb(var(--primary-50));
+                            color: rgb(var(--primary-600)) !important;
+                            text-decoration: none !important;
+                            font-weight: 600;
+                        }
+                        .dark .fi-wi-stats-overview-stat-description a[href$="/admin/complaint-live-screen"] {
+                            background: rgba(255, 255, 255, 0.06);
+                            color: rgb(var(--primary-400)) !important;
+                        }
+                    }
+
+                    @media (min-width: 640px) and (max-width: 1023px) {
+                        /* Wider phones / tablets: two cards side by side */
+                        .fi-ta-table > tbody {
+                            display: grid;
+                            grid-template-columns: repeat(2, minmax(0, 1fr));
+                            gap: 0.75rem;
+                            align-items: start;
+                        }
+                        .fi-ta-table > tbody > tr.fi-ta-row:not(.hidden) {
+                            margin-bottom: 0;
+                        }
+                    }
+
+                    @media (max-width: 639px) {
+                        .fi-wi-stats-overview-stats-ctn {
+                            grid-template-columns: minmax(0, 1fr) !important;
+                        }
+                        /* Breadcrumbs repeat the page title; save the space */
+                        .fi-header .fi-breadcrumbs {
+                            display: none;
+                        }
+                        .fi-header-heading {
+                            font-size: 1.5rem !important;
+                            line-height: 2rem !important;
+                        }
+                        .fi-header .fi-ac {
+                            width: 100%;
+                        }
+                        .fi-header .fi-ac > * {
+                            flex: 1 1 auto;
+                        }
+                    }
+
+                    @media (max-width: 767px) {
                         /* Forms: 16px+ text avoids the browser zooming into fields, bigger tap targets */
                         .fi-input,
                         .fi-select-input,
